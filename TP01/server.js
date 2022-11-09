@@ -30,7 +30,8 @@ app.use('/jquery', express.static(path.join(__dirname, 'node_modules/jquery/dist
 app.use('/public', express.static(path.join(__dirname, 'assets')))
 
 const router = require('./api/router');
-app.use("/", router)
+
+app.use(express.urlencoded({ extended: false }));
 
 // // Les données obtenues avec POST envoyées vers `/welcome` sont parsées avec 'body-parser' ou 'express'
 // app.post("/welcome", urlencodedParser, function(req, res) {
@@ -38,7 +39,6 @@ app.use("/", router)
 //     res.send(`Bienvenue ! Votre email est: '${req.body.email}' et votre mot de passe est: '${req.body.password}'`);
 // });
 
-app.use(express.urlencoded({ extended: false }));
 
 // app.post('/welcome', (req, res) => {
 //     res.send({
@@ -51,7 +51,7 @@ app.use(express.urlencoded({ extended: false }));
 mongoose.connect(process.env.MONGO_URI, {
     useNewUrlParser: true,
     useUnifiedTopology: true,
-    dbName: 'user'
+    dbName: 'database'
 })
 .then(() => {
     console.log("Connexion à la BDD avec succès");
@@ -60,27 +60,15 @@ mongoose.connect(process.env.MONGO_URI, {
     console.log(err);
 })
 
-const UserSchema = new mongoose.Schema({
-    email:{
-        type: String,
-        required: true
-    },
-    password:{
-        type: String,
-        required: true
-    },
-})
 
-const User = mongoose.model('User', UserSchema)
-
-app.post('/welcome', (req, res) => {
-    let newUser = new User({
-        email: req.body.email,
-        password: req.body.password,
-    })
-    newUser.save();
-    res.redirect('/inscription')
-})
+// app.post('/welcome', (req, res) => {
+//     let newUser = new User({
+//         email: req.body.email,
+//         password: req.body.password,
+//     })
+//     newUser.save();
+//     res.redirect('/inscription')
+// })
 
 const ArticleSchema = new mongoose.Schema({
     title:{
@@ -113,6 +101,7 @@ app.post('/success_article', (req, res) => {
     res.redirect('/create_article')
 })
 
+app.use("/", router)
 
 // On lance l'ecoute sur le port déclaré plus haut
 app.listen(port, () => {
