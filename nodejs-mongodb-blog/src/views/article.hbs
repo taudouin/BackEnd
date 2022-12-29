@@ -1,0 +1,73 @@
+<div class="container my-5">
+    <input type="text" value="{{article.id}}">
+    <section class="card">
+        <div class="px-lg-5">
+            <img src="/img/{{article.formFile}}" class="card-img-top px-lg-5" alt="{{article.formFile}}" />
+        </div>
+        <div class="card-body">
+            <h2 class="fw-bold">{{article.title}}</h2>
+            <p class="fst-italic">Par {{article.author}}, le {{moment article.createdAt format="DD/MM/YYYY"}} à {{moment article.createdAt format="HH:mm"}}</p>
+            <textarea id="content-article" class="form-control" style="height: 80vh" disabled>{{article.content}}</textarea>
+        </div>
+    </section>
+    {{#each commentData}}
+    <section class="col-md-12 mx-auto my-3">
+        <div class="d-flex align-items-center highlight-toolbar bg-secondary bg-opacity-25 ps-3 pe-2 py-1 border border-secondary border-bottom-0 rounded-top">
+            <small class="font-monospace text-muted">{{user}}, le {{moment createdAt format="DD/MM/YYYY"}} à {{moment createdAt format="HH:mm"}}</small>
+            {{#ifCond ../user.id userId}}
+            <div class="d-flex ms-auto">
+                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
+                    <button type="button" class="btn mt-0 me-0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer son commentaire">
+                        <i class="fa fa-edit" aria-hidden="true"></i>
+                    </button>
+                </span>
+                <a href="/article/comment/{{_id}}" type="button" class="btn text-nowrap"
+                  onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ? {{_id}}');" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer son commentaire">
+                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                </a>
+
+<form action="/article/comment/{{_id}}" method="POST" enctype="application/x-www-form-urlencoded"> <!-- TODO Supprime seulement le dernier ID et non cel-ci -->
+    <div class="offcanvas offcanvas-bottom bg-light bg-opacity-75" data-bs-scroll="true" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title" id="offcanvasBottomLabel">Modification du commentaire {{_id}}</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="form-group offcanvas-body small text-center">
+            <textarea class="col-12 border border-secondary p-2 comment-textarea" name="comment">{{comment}}</textarea>
+            <button class="btn btn-primary btn-block mt-4" type="submit"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Modifier le commentaire">
+                Modifier
+            </button>
+        </div>
+    </div>
+</form>
+                <button type="button" class="btn btn-outline-secondary text-nowrap" hidden>
+                    Modifier
+                </button>
+            </div>
+            {{/ifCond}}
+        </div>
+        <textarea class="col-12 border border-secondary border-top-0 p-2 comment-textarea" readonly>{{comment}}</textarea>
+        <input type="text" value="{{_id}}">
+    </section>
+    {{/each}}
+
+    <hr class="mt-5 mb-3">
+    {{#if user}}
+    <form class="col-md-12 mx-auto" action="/article/{{article.id}}" method="POST" enctype="application/x-www-form-urlencoded">
+        <h4 class="text-center">Laisser un commentaire</h4>
+        <input type="text" name="articleId" value="{{article.id}}" hidden>
+        <div class="form-group mb-2">
+            <textarea class="col-12 p-3" name="comment"></textarea>
+        </div>
+        <div class="form-group text-center">
+            <button class="btn btn-primary btn-block" type="submit"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Envoyer le commentaire">
+                Envoyer
+            </button>
+        </div>
+    </form>
+    {{else}}
+    <section class="col-md-12 mx-auto my-3 justify-content-center">
+        <h6 class="text-danger">Pour laisser un commentaire, vous <b>devez être connecté !</b></h6>
+    </section>
+    {{/if}}
+</div>
