@@ -13,11 +13,11 @@ usersController.renderSignUpForm = (req, res) => {
     res.render('users/signup');
 };
 
-usersController.signUp = async (req, res) => { // Ajouter question secrète avec réponse
+usersController.signUp = async (req, res) => { // TODO Ajouter question secrète avec réponse
     const errors = [];
     const { fullname, password, confirm_password } = req.body;
     const email = req.body.email.toLowerCase();
-    const uniqueString = randString(100);
+    const uniqueString = randString(128);
     const isValid = false;
     if (fullname === "" || email === "" || password === "" || confirm_password === "") {
         errors.push({text: `Au moins l'un des champs est vide !`});
@@ -63,7 +63,7 @@ usersController.signUp = async (req, res) => { // Ajouter question secrète avec
                 req.flash('error_msg', 'Ce nom est déjà utilisé !');
                 res.redirect('/users/signup');
             } else {
-                const newUser = new User({fullname, email, password, uniqueString, isValid});
+                const newUser = new User({fullname, email, password, uniqueString, isValid, role: 'user'});
                 newUser.password = await newUser.encrypPassword(password)
                 await newUser.save();
                 newUser.id = newUser._id;
@@ -77,26 +77,15 @@ usersController.signUp = async (req, res) => { // Ajouter question secrète avec
     }
 };
 
-const randString = () => {
-    // Considering a 8 length string
-    const len = 8;
-    let randStr = '';
-    for (let i=0; i<len; i++) {
-        //ch = a number between 1 to 10
-        const ch = Math.floor((Math.random() * 10) + 1);
-        randStr += ch;
+randString = (length) => {
+    let result           = '';
+    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    return randStr;
-};
-// randString = (length) => {               // TODO avoir une string plutôt que des nombres /\ :id dans les routes
-//     let result           = '';
-//     let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-//     let charactersLength = characters.length;
-//     for ( let i = 0; i < length; i++ ) {
-//         result += characters.charAt(Math.floor(Math.random() * charactersLength));
-//     }
-//     return result;
-// }
+    return result;
+}
 
 const sendEmail = (fullname, email, uniqueString, imgLogo) => {
     // Create a SMTP transporter object
@@ -121,6 +110,12 @@ const sendEmail = (fullname, email, uniqueString, imgLogo) => {
             <hr>
             <p style="text-align: center;">
                 Cliquez sur ce <a href="${WEBSITE_HOST}:${WEBSITE_PORT}/users/verify/${uniqueString}" style="text-decoration:none"><strong>lien</strong></a> pour valider votre email !
+            </p>
+            <br>
+            <p style="overflow-wrap: break-word">
+                Si le lien ne fonctionne pas, veuillez recopier ce lien dans votre navigateur :
+                <br>
+                ${WEBSITE_HOST}:${WEBSITE_PORT}/users/verify/${uniqueString}
             </p>
         `
     };
@@ -187,22 +182,26 @@ usersController.renderSignInForm = async (req, res) => {
     }
 };
 
-usersController.signIn = passport.authenticate('local', {
-    failureRedirect: '/users/signin',
-    successRedirect: '/',                                         // TODO Double 'back' => redirect to 'referer'
-    failureFlash: true
-}), (req, res, next) => {
-    console.log('0');
-    if ( req.method == 'POST' && req.url == '/users/signin' ) {
-        if ( req.body.rememberme ) {
-            req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
-            console.log('1');
-        } else {                                                  // TODO checkbox rester connecté avec cookie = 1 mois
-            req.session.cookie.expires = false;
-            console.log('2');
+usersController.signIn = (req, res, next) => {
+    let authFunction = passport.authenticate("local", (err, user) => {
+        if (err) {
+            next(err);
+        } else {
+            req.logIn(user, (err) => {
+                if (err) {
+                    next(err);
+                } else {
+                    if (req.body.rememberMe) {
+                        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+                    } else {
+                        req.session.cookie.maxAge = 60 * 60 * 1000;
+                    }
+                    res.redirect(req.body.referer);
+                }
+            })
         }
-    }
-    next();
+    });
+    authFunction(req, res, next);
 };
 
 usersController.renderEditForm = async (req, res) => {
@@ -326,7 +325,7 @@ usersController.forgotPasswordCheckEmail = async (req, res) => {
         errors.push({text: `L'adresse email n'est pas conforme !`});
     }
     if (errors.length > 0) {
-        let { fullname, email} = req.user;
+        let { email} = req.user;
         res.render('users/forgot-password', {
             errors,
             email,
@@ -341,7 +340,7 @@ usersController.forgotPasswordCheckEmail = async (req, res) => {
             });
         } else {
             const imgLogo = '/public/img/logo.png'
-            const uniqueString = randStringCheckEmail();
+            const uniqueString = randStringCheckEmail(128);
             await User.findByIdAndUpdate(emailUser.id, { uniqueString: uniqueString });
             sendEmailCheckEmail(email, uniqueString, imgLogo);
             req.flash('info_msg', 'Un email pour réinitialiser votre mot de passe vous a été envoyé !');
@@ -350,17 +349,15 @@ usersController.forgotPasswordCheckEmail = async (req, res) => {
     }
 };
 
-const randStringCheckEmail = () => {
-    // Considering a 8 length string
-    const len = 8;
-    let randStr = '';
-    for (let i=0; i<len; i++) {
-        //ch = a number between 1 to 10
-        const ch = Math.floor((Math.random() * 10) + 1);
-        randStr += ch;
+randStringCheckEmail = (length) => {
+    let result           = '';
+    let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    let charactersLength = characters.length;
+    for ( let i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
     }
-    return randStr;
-};
+    return result;
+}
 
 const sendEmailCheckEmail = (email, uniqueString, imgLogo) => {
     // Create a SMTP transporter object
@@ -386,8 +383,13 @@ const sendEmailCheckEmail = (email, uniqueString, imgLogo) => {
         <p style="text-align: center;">
             Cliquez sur ce <a href="${WEBSITE_HOST}:${WEBSITE_PORT}/users/check-email/${uniqueString}" style="text-decoration:none"><strong>lien</strong></a> réinitialiser votre mot de passe !
         </p>
-  </video>
-  `
+        <br>
+        <p style="overflow-wrap: break-word">
+            Si le lien ne fonctionne pas, veuillez recopier ce lien dans votre navigateur :
+            <br>
+            ${WEBSITE_HOST}:${WEBSITE_PORT}/users/check-email/${uniqueString}
+        </p>
+        `
     };
 
     transporter.sendMail(mailOptions, (err, res) => {
@@ -414,15 +416,15 @@ usersController.verifyEmailResetEmail = async (req, res) => {
 };
 
 usersController.resetPasswordForm = async (req, res) => {
-    const user = await User.findOne(req.params).lean();
-    res.render('users/reset-password', { user });
+    const userId = await User.findOne(req.params).lean();
+    res.render('users/reset-password', { userId });
 };
 
 usersController.resetPassword = async (req, res) => {
     const errors = [];
     let { password, confirm_password } = req.body;
-    const user = await User.findOne(req.params).lean();
-    const matchNewPassword = await bcrypt.compare(password, user.password);
+    const userId = await User.findOne(req.params).lean();
+    const matchNewPassword = await bcrypt.compare(password, userId.password);
 
     if ( password === "" || confirm_password === "" ) {
         errors.push({text: `Au moins l'un des champs est vide !`});
@@ -446,13 +448,13 @@ usersController.resetPassword = async (req, res) => {
     if (errors.length > 0) {
         res.render('users/reset-password', {
             errors,
-            user
+            userId
         })
     } else {
         const salt = await bcrypt.genSalt(10);
         let newPassword = await bcrypt.hash(password, salt);
         let uniqueString = "";
-        await User.findByIdAndUpdate(user.id, { password: newPassword, uniqueString: uniqueString });
+        await User.findByIdAndUpdate(userId.id, { password: newPassword, uniqueString: uniqueString });
         req.flash('success_msg', `Le mot de passe a bien été mis à jour ! Veuillez vous reconnecter !`);
         res.redirect('/users/signin');
     }
@@ -495,7 +497,7 @@ usersController.logout = (req, res, next) => {
             return next(err)
         }
         req.flash('success_msg', 'Vous êtes bien déconnecté !');
-        res.redirect('/users/signin');
+        res.redirect(req.headers.referer);
     });
 
 };

@@ -103,26 +103,25 @@ articlesController.updateArticle = async (req, res, next) => {
     }
 };
 
-articlesController.deleteArticle = (req, res) => {
-    Article.findByIdAndRemove(req.params.id, (err, Article) => {
-        if (!err) {
-          const directoryPath = 'src/public/img/uploads/';
-          const filenameImg = Article.formFile;
-          fs.unlink(directoryPath + filenameImg, (err) => {
-            if (err) {
-                console.log(`Error :` + err);
-            }
-            req.flash('success_msg', `L'article a bien été supprimé !`);
-            res.redirect("/admin/articles");
-          })
+articlesController.deleteArticle = async (req, res) => {
+    const image = await Article.findById(req.params.id).lean();
+    const directoryPath = 'src/public/img/uploads/';
+    const filenameImg = image.formFile;
+    fs.unlink(directoryPath + filenameImg, (err) => {
+        if (err) {
+            console.log(`Error :` + err);
+            return;
         }
-    });
-}
+    })
+    await Comment.deleteMany({articleId: req.params.id}).lean();
+    await Article.findByIdAndRemove(req.params.id);
+    req.flash('success_msg', `L'article et les commentaires liés ont bien été supprimés !`);
+    res.redirect("/admin/articles");
+};
 
 articlesController.renderAllArticles = async (req, res) => {
-    let articlesCarousel = [];
-    const perPage = 15; // Number of articles in one page
-    const page = req.query.page;
+    const perPage = 9; // Number of articles in one page
+    const page = req.query.p;
     Article
     .find({})
     .skip((perPage * page) - perPage)
@@ -130,23 +129,58 @@ articlesController.renderAllArticles = async (req, res) => {
     .sort({createdAt: 'desc'})
     .lean()
     .exec((err, articles) => {
-        Article.count().exec((err, count) => {
+        Article.countDocuments().lean().exec((err, count) => {
             if (err)
                 return next(err)
-            res.render('index', {
-                current: page,
-                pages: Math.ceil(count / perPage),
-                articles: articles.splice(3),
-                articlesCarousel: articles.splice(0,3),
-            });
-        });
-    });
+            if (page > 1) {
+                res.render('index', {
+                    pagination: {
+                        page: page || 1,
+                        pageCount: Math.ceil(count / perPage)
+                    },
+                    articles: articles,
+                })
+            } else {
+                res.render('index', {
+                    pagination: {
+                        page: page || 1,
+                        pageCount: Math.ceil(count / perPage)
+                    },
+                    articles: articles.splice(3),
+                    articlesCarousel: articles.splice(0,3),
+                    count
+                })
+            }
+        })
+    })
 };
 
 articlesController.renderOneArticle = async (req, res) => {
     const article = await Article.findById(req.params.id).lean();
-    const commentData = await Comment.find({articleId: req.params.id}).sort({createdAt: 'desc'}).lean();
-    res.render('article', { article, commentData });
+    const perPage = 6; // Number of comments in one page
+    const page = req.query.p;
+    Comment
+    .find({articleId: req.params.id})
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .sort({createdAt: 'desc'})
+    .lean()
+    .exec((err, commentData) => {
+        Comment.countDocuments({articleId: req.params.id}).lean().exec((err, count) => {
+            if (err)
+                return next(err)
+            res.render('article', {
+                pagination: {
+                    page: page || 1,
+                    pageCount: Math.ceil(count / perPage)
+                },
+                commentData,
+                article,
+                count
+            })
+         })
+    })
 };
+
 
 module.exports = articlesController;

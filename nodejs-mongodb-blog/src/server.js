@@ -9,7 +9,7 @@ const passport = require('passport');
 const UNIQUE_TOKEN = process.env;
 const MomentHandler = require('handlebars.moment');
 const back = require('express-back');
-const paginateHelper = require('express-handlebars-paginate');
+const paginate = require('handlebars-paginate');
 
 // Initializations
 const app = express();
@@ -38,6 +38,7 @@ app.use(session({
         secure: false,
         httpOnly: false,
         sameSite: 'strict',
+        // maxAge: 60 * 60 * 1000
     },
 }));
 app.use(passport.initialize());
@@ -49,11 +50,25 @@ app.use(back());
 MomentHandler.registerHelpers(Handlebars);
 Handlebars.registerHelper('ifCond', function (v1, v2, options) {
     if (v1 === v2) {
-      return options.fn(this);
+        return options.fn(this);
     }
     return options.inverse(this);
   });
-Handlebars.registerHelper('paginateHelper', paginateHelper);
+Handlebars.registerHelper('ifDiff', function (v1, v2, options) {
+    if (v1 < v2) {
+        return options.fn(this);
+    }
+    return options.inverse(this);
+  });
+
+Handlebars.registerHelper('ifAdmin', function (v1, options) {
+    let v2 = 'admin';
+    if (v1 === v2) {
+        return options.fn(this);
+    }
+    return options.inverse(this);
+});
+Handlebars.registerHelper('paginate', paginate);
 
 // Global Variables
 app.use((req, res, next) => {

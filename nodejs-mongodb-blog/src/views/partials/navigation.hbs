@@ -36,6 +36,7 @@
                 {{user.fullname}}
               </a>
               <ul class="dropdown-menu">
+                {{#ifAdmin user.role}}
                 <li><a class="dropdown-item" href="/admin/articles"><i
                       class="fa-solid fa-rectangle-list me-2"
                     ></i>Liste des articles</a></li>
@@ -47,6 +48,8 @@
                       class="fa-solid fa-users me-2"
                     ></i>Liste des utilisateurs</a></li>
                 <li><hr class="dropdown-divider" /></li>
+                {{else}}
+                {{/ifAdmin}}
                 <li><a
                     class="dropdown-item"
                     href="/users/profile/{{user.id}}"

@@ -71,7 +71,6 @@ contactController.sendContactForm = (req, res) => {
                 console.log(err);
             } else {
                 console.log('Email sent: ' + info.response);
-                // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 req.flash('success_msg', `Le message a bien été envoyé !`);
                 res.redirect('back');
             }

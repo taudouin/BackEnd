@@ -31,7 +31,8 @@ passport.deserializeUser((id, done) => {
         const userInformation = {
             fullname: user.fullname,
             email: user.email,
-            id: user.id
+            id: user.id,
+            role: user.role
         }
         done(err, userInformation);
     })
