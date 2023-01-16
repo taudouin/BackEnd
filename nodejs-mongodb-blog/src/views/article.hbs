@@ -10,41 +10,44 @@
             <textarea id="content-article" class="form-control" style="height: 80vh" disabled>{{article.content}}</textarea>
         </div>
     </section>
+
+    <hr class="my-4" id="tag">
+    <h4 class="text-center my-4">Liste des commentaires</h4>
     {{#each commentData}}
     <section class="col-md-12 mx-auto my-3">
         <div class="d-flex align-items-center highlight-toolbar bg-secondary bg-opacity-25 ps-3 pe-2 py-1 border border-secondary border-bottom-0 rounded-top">
             <small class="font-monospace text-muted">{{user}}, le {{moment createdAt format="DD/MM/YYYY"}} à {{moment createdAt format="HH:mm"}}</small>
+
             {{#ifCond ../user.id userId}}
             <div class="d-flex ms-auto">
                 <span data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
                     <button type="button" class="btn mt-0 me-0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer son commentaire">
                         <i class="fa fa-edit" aria-hidden="true"></i>
                     </button>
-
-<form action="/article/comment/{{_id}}" method="POST" enctype="application/x-www-form-urlencoded"> <!-- TODO Supprime seulement le dernier ID et non celui-ci -->
-    <div class="offcanvas offcanvas-bottom bg-light bg-opacity-75" data-bs-scroll="true" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasBottomLabel">Modification du commentaire {{_id}}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="form-group offcanvas-body small text-center">
-            <textarea class="col-12 border border-secondary p-2 comment-textarea" name="comment">{{comment}}</textarea>
-            <button class="btn btn-primary btn-block mt-4" type="submit" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Modifier le commentaire">
-                Modifier
-            </button>
-        </div>
-    </div>
-</form>
                 </span>
                 <a href="/article/comment/{{_id}}" type="button" class="btn text-nowrap"
                   onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ? {{_id}}');" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer son commentaire">
                     <i class="fa-solid fa-trash" aria-hidden="true"></i>
                 </a>
 
+                <form action="/article/comment/{{_id}}" method="POST" enctype="application/x-www-form-urlencoded"> <!-- TODO Update seulement le dernier ID et non celui-ci -->
+                    <div class="offcanvas offcanvas-bottom bg-light bg-opacity-75" data-bs-scroll="true" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+                        <div class="offcanvas-header">
+                            <h5 class="offcanvas-title" id="offcanvasBottomLabel">Modification du commentaire {{_id}}</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+                        </div>
+                        <div class="form-group offcanvas-body small text-center">
+                            <textarea class="col-12 border border-secondary p-2 comment-textarea" name="comment">{{comment}}</textarea>
+                            <button class="btn btn-primary btn-block mt-4" type="submit" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Modifier le commentaire">
+                                Modifier
+                            </button>
+                        </div>
+                    </div>
+                </form>
 
-                <button type="button" class="btn btn-outline-secondary text-nowrap" hidden>
+                {{!-- <button type="button" class="btn btn-outline-secondary text-nowrap" hidden>
                     Modifier
-                </button>
+                </button> --}}
             </div>
             {{/ifCond}}
         </div>
@@ -58,23 +61,23 @@
     <div class="d-flex justify-content-center">
         <ul class="pagination">
             {{#paginate pagination type="first"}}
-            <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angles-left"></i></a></li>
+            <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}#tag"><i class="fa-solid fa-angles-left"></i></a></li>
             {{/paginate}}
 
             {{#paginate pagination type="previous"}}
-            <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angle-left"></i></a></li>
+            <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}#tag"><i class="fa-solid fa-angle-left"></i></a></li>
             {{/paginate}}
 
             {{#paginate pagination type="middle" limit=pagination.pageCount}}
-            <li {{#if active}} class="pageNumber active" {{/if}}><a class="page-link" href="?p={{n}}">{{n}}</a></li>
+            <li {{#if active}} class="pageNumber active" {{/if}}><a class="page-link" href="?p={{n}}#tag">{{n}}</a></li>
             {{/paginate}}
 
             {{#paginate pagination type="next"}}
-            <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angle-right"></i></a></li>
+            <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}#tag"><i class="fa-solid fa-angle-right"></i></a></li>
             {{/paginate}}
 
             {{#paginate pagination type="last"}}
-            <li {{#if disabled}}class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angles-right"></i></a></li>
+            <li {{#if disabled}}class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}#tag"><i class="fa-solid fa-angles-right"></i></a></li>
             {{/paginate}}
         </ul>
     </div>
@@ -100,3 +103,4 @@
     </section>
     {{/if}}
 </div>
+

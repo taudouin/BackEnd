@@ -189,14 +189,19 @@ usersController.signIn = (req, res, next) => {
         } else {
             req.logIn(user, (err) => {
                 if (err) {
-                    next(err);
+                    req.flash('error_msg', `Au moins l'un des champs est incorrect !`);
+                    res.redirect('/users/signin');
                 } else {
                     if (req.body.rememberMe) {
                         req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
                     } else {
                         req.session.cookie.maxAge = 60 * 60 * 1000;
                     }
-                    res.redirect(req.body.referer);
+                    if (req.body.referer === '/users/signup' || req.body.referer === '/users/signin') {
+                        res.redirect('/')
+                    } else {
+                        res.redirect(req.body.referer);
+                    }
                 }
             })
         }

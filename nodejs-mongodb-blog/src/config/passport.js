@@ -8,7 +8,8 @@ passport.use(new LocalStrategy({
     passwordField: 'password'
 }, async (email, password, done) => {
     // Match email's user
-    const user = await User.findOne({email})
+    ;
+    const user = await User.findOne({email: email.toLowerCase()});
     if (!user) {
         return done(null, false, {message: `L'utilisateur n'a pas été trouvé !`});
     } else {
@@ -28,12 +29,16 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser((id, done) => {
     User.findById(id, (err, user) => {
-        const userInformation = {
-            fullname: user.fullname,
-            email: user.email,
-            id: user.id,
-            role: user.role
+        if (!user) {
+            return done(null, false, {message: `Vous n'êtes plus dans la base de données !`});
+        } else {
+            const userInformation = {
+                fullname: user.fullname,
+                email: user.email,
+                id: user.id,
+                role: user.role
         }
         done(err, userInformation);
+        }
     })
 })
