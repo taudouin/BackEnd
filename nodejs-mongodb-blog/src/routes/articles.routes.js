@@ -21,14 +21,14 @@ const hasAccess = require('../helpers/hasAccess');
 
 // New article
 router.get('/admin/articles/add', isValidated, isAuthenticated, hasAccess('admin'), renderArticleForm);
-router.post('/admin/articles/new-article',upload.single("formFile"), isValidated, isAuthenticated, hasAccess('admin'), createNewArticle);
+router.post('/admin/articles/new-article', upload.single('formFile'), isValidated, isAuthenticated, hasAccess('admin'), createNewArticle);
 
 // Get all articles for admin
 router.get('/admin/articles', isValidated, isAuthenticated, hasAccess('admin'), renderArticles);
 
 // Edit article
 router.get('/admin/articles/edit/:id', isValidated, isAuthenticated, hasAccess('admin'), renderEditForm);
-router.post('/admin/articles/edit/:id', upload.single("formFile"), isValidated, isAuthenticated, hasAccess('admin'), updateArticle);
+router.post('/admin/articles/edit/:id', upload.single('formFile'), isValidated, isAuthenticated, hasAccess('admin'), updateArticle);
 
 // Delete article
 router.get('/admin/articles/delete/:id', isValidated, isAuthenticated, hasAccess('admin'), deleteArticle);

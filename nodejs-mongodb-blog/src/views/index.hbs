@@ -8,7 +8,7 @@
     <div class="carousel-inner">
       {{#each articlesCarousel}}
       <a href="/article/{{_id}}">
-      <div class="carousel-item {{#if @first }}active{{/if}}" data-bs-interval="4000">
+      <div class="carousel-item {{#if @first}}active{{/if}}" data-bs-interval="4000">
         <img src="/img/{{formFile}}" class="d-block w-100" alt="{{formFile}}">
         <div class="carousel-caption d-none d-md-block">
           <h5 class="fw-bold">{{title}}</h5>
@@ -27,9 +27,9 @@
       <span class="visually-hidden">Suivant</span>
     </button>
   </div>
-  <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+  <section class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
     {{#each articles}}
-      <div class="col">
+      <article class="col">
         <a href="/article/{{_id}}">
           <div class="card h-100">
             <img
@@ -46,9 +46,9 @@
             </div>
           </div>
         </a>
-      </div>
+      </article>
     {{/each}}
-  </div>
+  </section>
 </div>
 
 {{#ifDiff count 10}}

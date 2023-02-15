@@ -19,32 +19,73 @@ usersController.signUp = async (req, res) => { // TODO Ajouter question secrète
     const email = req.body.email.toLowerCase();
     const uniqueString = randString(128);
     const isValid = false;
-    if (fullname === "" || email === "" || password === "" || confirm_password === "") {
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (fullname.length < 3) {
-        errors.push({text: 'Le nom est trop court !'});
-    } else if (fullname.length > 30) {
-        errors.push({text: 'Le nom est trop long !'});
-    } else if (email.length < 8) {
-        errors.push({text: `L'adresse email est trop courte !`});
-    } else if (email.length > 40) {
-        errors.push({text: `L'adresse email est trop longue !`});
-    } else if (!validator.isEmail(email)) {
-        errors.push({text: `L'adresse email n'est pas conforme !`});
-    } else if (!/\d/.test(password)) {
-        errors.push({text: 'Le mot de passe doit contenir au moins un chiffre !'});
-    } else if (!/[a-z]/.test(password)) {
-        errors.push({text: 'Le mot de passe doit contenir au moins une minuscule !'});
-    } else if (!/[A-Z]/.test(password)) {
-        errors.push({text: 'Le mot de passe doit contenir au moins une majuscule !'});
-    } else if (!/[!@#\$%\^&\*]/.test(password)) {
-        errors.push({text: 'Le mot de passe doit contenir au moins un caractère spécial !'});
-    } else if (password.length < 8) {
-        errors.push({text: 'Le mot de passe est trop court !'});
-    } else if (password.length > 15) {
-        errors.push({text: 'Le mot de passe est trop long !'});
-    } else if (password != confirm_password) {
-        errors.push({text: 'Les mots de passe ne correspondent pas !'});
+    // if (fullname === "" || email === "" || password === "" || confirm_password === "") {
+    //     errors.push({text: `Au moins l'un des champs est vide !`});
+    // } else if (fullname.length < 3) {
+    //     errors.push({text: 'Le nom est trop court !'});
+    // } else if (fullname.length > 30) {
+    //     errors.push({text: 'Le nom est trop long !'});
+    // } else if (email.length < 8) {
+    //     errors.push({text: `L'adresse email est trop courte !`});
+    // } else if (email.length > 40) {
+    //     errors.push({text: `L'adresse email est trop longue !`});
+    // } else if (!validator.isEmail(email)) {
+    //     errors.push({text: `L'adresse email n'est pas conforme !`});
+    // } else if (!/\d/.test(password)) {
+    //     errors.push({text: 'Le mot de passe doit contenir au moins un chiffre !'});
+    // } else if (!/[a-z]/.test(password)) {
+    //     errors.push({text: 'Le mot de passe doit contenir au moins une minuscule !'});
+    // } else if (!/[A-Z]/.test(password)) {
+    //     errors.push({text: 'Le mot de passe doit contenir au moins une majuscule !'});
+    // } else if (!/[!@#\$%\^&\*]/.test(password)) {
+    //     errors.push({text: 'Le mot de passe doit contenir au moins un caractère spécial !'});
+    // } else if (password.length < 8) {
+    //     errors.push({text: 'Le mot de passe est trop court !'});
+    // } else if (password.length > 15) {
+    //     errors.push({text: 'Le mot de passe est trop long !'});
+    // } else if (password != confirm_password) {
+    //     errors.push({text: 'Les mots de passe ne correspondent pas !'});
+    // }
+    switch (true) {
+        case fullname === "" || email === "" || password === "" || confirm_password === "":
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case fullname.length < 3:
+            errors.push({text: 'Le nom est trop court !'});
+            break;
+        case fullname.length > 30:
+            errors.push({text: 'Le nom est trop long !'});
+            break;
+        case email.length < 8:
+            errors.push({text: `L'adresse email est trop courte !`});
+            break;
+        case email.length > 40:
+            errors.push({text: `L'adresse email est trop longue !`});
+            break;
+        case !validator.isEmail(email):
+            errors.push({text: `L'adresse email n'est pas conforme !`});
+            break;
+        case !/\d/.test(password):
+            errors.push({text: 'Le mot de passe doit contenir au moins un chiffre !'});
+            break;
+        case !/[a-z]/.test(password):
+            errors.push({text: 'Le mot de passe doit contenir au moins une minuscule !'});
+            break;
+        case !/[A-Z]/.test(password):
+            errors.push({text: 'Le mot de passe doit contenir au moins une majuscule !'});
+            break;
+        case !/[!@#\$%\^&\*]/.test(password):
+            errors.push({text: 'Le mot de passe doit contenir au moins un caractère spécial !'});
+            break;
+        case password.length < 8:
+            errors.push({text: 'Le mot de passe est trop court !'});
+            break;
+        case password.length > 15:
+            errors.push({text: 'Le mot de passe est trop long !'});
+            break;
+        case password != confirm_password:
+            errors.push({text: 'Les mots de passe ne correspondent pas !'});
+            break;
     }
     if (errors.length > 0) {
         res.render('users/signup', {
@@ -90,12 +131,12 @@ randString = (length) => {
 const sendEmail = (fullname, email, uniqueString, imgLogo) => {
     // Create a SMTP transporter object
     let transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
+        host: EMAIL_SMTP_SERVER,
+        port: PORT_SMTP_SERVER,
         secure: false,
         auth: {
-            user: 't.audouin@gmail.com',
-            pass: 'tlyjndpyrncrydvg'
+            user: EMAIL_USER,
+            pass: EMAIL_PASSWORD
         },
     });
 
@@ -159,17 +200,6 @@ usersController.isValidated = async (req, res, next) => {
     } else {
         return next();
     }
-    // ANCIEN CODE, LE TEMPS DE VOIR SI LE NOUVEAU TIENT MIEUX LA ROUTE
-    // if (user === null || user.id === null) {
-    //     req.flash('error_msg', `Vous avez été déconnecté !`); // TODO if pas connecté
-    //     res.redirect('/users/signin');
-    // }
-    // const userId = await User.findById(user.id); // TODO Voir si ça fonctionne avec else if
-    // if (userId === null || userId.isValid === false) {
-    //     req.flash('error_msg', `L'adresse email n'a pas encore été validée !`);
-    //     res.redirect('/users/signin');
-    // }
-    // return next();
 }
 
 usersController.renderSignInForm = async (req, res) => {
@@ -219,18 +249,25 @@ usersController.updateUser = async (req, res, next) => {
     const { fullname } = req.body;
     const email = req.body.email.toLowerCase();
 
-    if (fullname === "" || email === "" ) {
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (fullname.length < 3) {
-        errors.push({text: 'Le nom est trop court !'});
-    } else if (fullname.length > 30) {
-        errors.push({text: 'Le nom est trop long !'});
-    } else if (email.length < 8) {
-        errors.push({text: `L'adresse email est trop courte !`});
-    } else if (email.length > 40) {
-        errors.push({text: `L'adresse email est trop longue !`});
-    } else if (!validator.isEmail(email)) {
-        errors.push({text: `L'adresse email n'est pas conforme !`});
+    switch (true) {
+        case fullname === '' || email === '':
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case fullname.length < 3:
+            errors.push({text: 'Le nom est trop court !'});
+            break;
+        case email.length > 30:
+            errors.push({text: 'Le nom est trop long !'});
+            break;
+        case email.length < 8:
+            errors.push({text: `L'adresse email est trop courte !`});
+            break;
+        case email.length > 40:
+            errors.push({text: `L'adresse email est trop longue !`});
+            break;
+        case !validator.isEmail(email):
+            errors.push({text: `L'adresse email n'est pas conforme !`});
+            break;
     }
     if (errors.length > 0) {
         let { fullname, email} = req.user;
@@ -278,26 +315,59 @@ usersController.changePassword = async (req, res) => {
     const match = await bcrypt.compare(actual_password, user.password);
     const matchNewPassword = await bcrypt.compare(password, user.password);
 
-    if (actual_password === "" || password === "" || confirm_password === "" ) {
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (!match) {
-        errors.push({text: `Le mot de passe actuel ne correspond pas !`});
-    } else if (!/\d/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins un chiffre !'});
-    } else if (!/[a-z]/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins une minuscule !'});
-    } else if (!/[A-Z]/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins une majuscule !'});
-    } else if (!/[!@#\$%\^&\*]/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins un caractère spécial !'});
-    } else if (password.length < 8) {
-        errors.push({text: 'Le nouveau mot de passe est trop court !'});
-    } else if (password.length > 15) {
-        errors.push({text: 'Le nouveau mot de passe est trop long !'});
-    } else if (matchNewPassword) {
-        errors.push({text: `Le nouveau mot de passe doit être différent de l'ancien !`});
-    } else if (password != confirm_password) {
-        errors.push({text: 'Les mots de passe ne correspondent pas !'});
+    // if (actual_password === "" || password === "" || confirm_password === "") {
+    //     errors.push({text: `Au moins l'un des champs est vide !`});
+    // } else if (!match) {
+    //     errors.push({text: `Le mot de passe actuel ne correspond pas !`});
+    // } else if (!/\d/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins un chiffre !'});
+    // } else if (!/[a-z]/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins une minuscule !'});
+    // } else if (!/[A-Z]/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins une majuscule !'});
+    // } else if (!/[!@#\$%\^&\*]/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins un caractère spécial !'});
+    // } else if (password.length < 8) {
+    //     errors.push({text: 'Le nouveau mot de passe est trop court !'});
+    // } else if (password.length > 15) {
+    //     errors.push({text: 'Le nouveau mot de passe est trop long !'});
+    // } else if (matchNewPassword) {
+    //     errors.push({text: `Le nouveau mot de passe doit être différent de l'ancien !`});
+    // } else if (password != confirm_password) {
+    //     errors.push({text: 'Les mots de passe ne correspondent pas !'});
+    // }
+
+    switch (true) {
+        case actual_password === "" || password === "" || confirm_password === "":
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case !match:
+            errors.push({text: `Le mot de passe actuel ne correspond pas !`});
+            break;
+        case !/\d/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins un chiffre !'});
+            break;
+        case !/[a-z]/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins une minuscule !'});
+            break;
+        case !/[A-Z]/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins une majuscule !'});
+            break;
+        case !/[!@#\$%\^&\*]/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins un caractère spécial !'});
+            break;
+        case password.length < 8:
+            errors.push({text: 'Le nouveau mot de passe est trop court !'});
+            break;
+        case password.length > 15:
+            errors.push({text: 'Le nouveau mot de passe est trop long !'});
+            break;
+        case matchNewPassword:
+            errors.push({text: `Le nouveau mot de passe doit être différent de l'ancien !`});
+            break;
+        case password != confirm_password:
+            errors.push({text: 'Les mots de passe ne correspondent pas !'});
+            break;
     }
     if (errors.length > 0) {
         res.render('users/change-password', {
@@ -320,14 +390,28 @@ usersController.forgotPasswordForm = (req, res) => {
 usersController.forgotPasswordCheckEmail = async (req, res) => {
     const errors = [];
     const email = req.body.email.toLowerCase();
-    if (email === "" ) {
-        errors.push({text: `Veuillez indiquer une adresse email`});
-    } else if (email.length < 8) {
-        errors.push({text: `L'adresse email est trop courte !`});
-    } else if (email.length > 40) {
-        errors.push({text: `L'adresse email est trop longue !`});
-    } else if (!validator.isEmail(email)) {
-        errors.push({text: `L'adresse email n'est pas conforme !`});
+    // if (email === "") {
+    //     errors.push({text: `Veuillez indiquer une adresse email`});
+    // } else if (email.length < 8) {
+    //     errors.push({text: `L'adresse email est trop courte !`});
+    // } else if (email.length > 40) {
+    //     errors.push({text: `L'adresse email est trop longue !`});
+    // } else if (!validator.isEmail(email)) {
+    //     errors.push({text: `L'adresse email n'est pas conforme !`});
+    // }
+    switch (true) {
+        case email === "":
+            errors.push({text: `Veuillez indiquer une adresse email`});
+            break;
+        case email.length < 8:
+            errors.push({text: `L'adresse email est trop courte !`});
+            break;
+        case email.length > 40:
+            errors.push({text: `L'adresse email est trop longue !`});
+            break;
+        case !validator.isEmail(email):
+            errors.push({text: `L'adresse email n'est pas conforme !`});
+            break;
     }
     if (errors.length > 0) {
         let { email} = req.user;
@@ -367,12 +451,12 @@ randStringCheckEmail = (length) => {
 const sendEmailCheckEmail = (email, uniqueString, imgLogo) => {
     // Create a SMTP transporter object
     let transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
+        host: EMAIL_SMTP_SERVER,
+        port: PORT_SMTP_SERVER,
         secure: false,
         auth: {
-            user: 't.audouin@gmail.com',
-            pass: 'tlyjndpyrncrydvg'
+            user: EMAIL_USER,
+            pass: EMAIL_PASSWORD
         },
     });
 
@@ -431,24 +515,53 @@ usersController.resetPassword = async (req, res) => {
     const userId = await User.findOne(req.params).lean();
     const matchNewPassword = await bcrypt.compare(password, userId.password);
 
-    if ( password === "" || confirm_password === "" ) {
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (!/\d/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins un chiffre !'});
-    } else if (!/[a-z]/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins une minuscule !'});
-    } else if (!/[A-Z]/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins une majuscule !'});
-    } else if (!/[!@#\$%\^&\*]/.test(password)) {
-        errors.push({text: 'Le nouveau mot de passe doit contenir au moins un caractère spécial !'});
-    } else if (password.length < 8) {
-        errors.push({text: 'Le nouveau mot de passe est trop court !'});
-    } else if (password.length > 15) {
-        errors.push({text: 'Le nouveau mot de passe est trop long !'});
-    } else if (matchNewPassword) {
-        errors.push({text: `Le nouveau mot de passe doit être différent de l'ancien !`});
-    } else if (password != confirm_password) {
-        errors.push({text: 'Les mots de passe ne correspondent pas !'});
+    // if (password === "" || confirm_password === "") {
+    //     errors.push({text: `Au moins l'un des champs est vide !`});
+    // } else if (!/\d/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins un chiffre !'});
+    // } else if (!/[a-z]/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins une minuscule !'});
+    // } else if (!/[A-Z]/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins une majuscule !'});
+    // } else if (!/[!@#\$%\^&\*]/.test(password)) {
+    //     errors.push({text: 'Le nouveau mot de passe doit contenir au moins un caractère spécial !'});
+    // } else if (password.length < 8) {
+    //     errors.push({text: 'Le nouveau mot de passe est trop court !'});
+    // } else if (password.length > 15) {
+    //     errors.push({text: 'Le nouveau mot de passe est trop long !'});
+    // } else if (matchNewPassword) {
+    //     errors.push({text: `Le nouveau mot de passe doit être différent de l'ancien !`});
+    // } else if (password != confirm_password) {
+    //     errors.push({text: 'Les mots de passe ne correspondent pas !'});
+    // }
+    switch (true) {
+        case password === "" || confirm_password === "":
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case !/\d/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins un chiffre !'});
+            break;
+        case !/[a-z]/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins une minuscule !'});
+            break;
+        case !/[A-Z]/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins une majuscule !'});
+            break;
+        case !/[!@#\$%\^&\*]/.test(password):
+            errors.push({text: 'Le nouveau mot de passe doit contenir au moins un caractère spécial !'});
+            break;
+        case password.length < 8:
+            errors.push({text: 'Le nouveau mot de passe est trop court !'});
+            break;
+        case password.length > 15:
+            errors.push({text: 'Le nouveau mot de passe est trop long !'});
+            break;
+        case matchNewPassword:
+            errors.push({text: `Le nouveau mot de passe doit être différent de l'ancien !`});
+            break;
+        case password != confirm_password:
+            errors.push({text: 'Les mots de passe ne correspondent pas !'});
+            break;
     }
     if (errors.length > 0) {
         res.render('users/reset-password', {

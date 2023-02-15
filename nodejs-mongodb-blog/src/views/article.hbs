@@ -1,6 +1,6 @@
-<div class="container my-5">
+<section class="container my-5">
     <input type="text" value="{{article.id}}">
-    <section class="card">
+    <article class="card">
         <div class="px-lg-5">
             <img src="/img/{{article.formFile}}" class="card-img-top px-lg-5" alt="{{article.formFile}}" />
         </div>
@@ -9,7 +9,7 @@
             <p class="fst-italic">Par {{article.author}}, le {{moment article.createdAt format="DD/MM/YYYY"}} à {{moment article.createdAt format="HH:mm"}}</p>
             <textarea id="content-article" class="form-control" style="height: 80vh" disabled>{{article.content}}</textarea>
         </div>
-    </section>
+    </article>
 
     <hr class="my-4" id="tag">
     <h4 class="text-center my-4">Liste des commentaires</h4>
@@ -102,5 +102,5 @@
         <h6 class="text-danger">Pour laisser un commentaire, vous <b>devez être connecté !</b></h6>
     </section>
     {{/if}}
-</div>
+</section>
 

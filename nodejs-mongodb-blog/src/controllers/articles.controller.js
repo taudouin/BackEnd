@@ -68,18 +68,38 @@ articlesController.updateArticle = async (req, res, next) => {
     const errors = [];
     const { title, content, description } = req.body;
     const formFile = req?.file?.filename;
-    if (title === "" || content === "") {
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (title.length < 3) {
-        errors.push({text: 'Le titre est trop court !'});
-    } else if (title.length > 30) {
-        errors.push({text: 'Le titre est trop long !'});
-    } else if (content.length < 15) {
-        errors.push({text: 'Le contenu est trop court !'});
-    } else if (description.length < 3) {
-        errors.push({text: 'La description est trop courte !'});
-    } else if (description.length > 150) {
-        errors.push({text: 'La description est trop longue !'});
+    // if (title === "" || content === "") {
+    //     errors.push({text: `Au moins l'un des champs est vide !`});
+    // } else if (title.length < 3) {
+    //     errors.push({text: 'Le titre est trop court !'});
+    // } else if (title.length > 30) {
+    //     errors.push({text: 'Le titre est trop long !'});
+    // } else if (content.length < 15) {
+    //     errors.push({text: 'Le contenu est trop court !'});
+    // } else if (description.length < 3) {
+    //     errors.push({text: 'La description est trop courte !'});
+    // } else if (description.length > 150) {
+    //     errors.push({text: 'La description est trop longue !'});
+    // }
+    switch (true) {
+        case title === "" || content === "":
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case title.length < 3:
+            errors.push({text: 'Le titre est trop court !'});
+            break;
+        case title.length > 30:
+            errors.push({text: 'Le titre est trop long !'});
+            break;
+        case content.length < 15:
+            errors.push({text: 'Le contenu est trop court !'});
+            break;
+        case description.length < 3:
+            errors.push({text: 'La description est trop courte !'});
+            break;
+        case description.length > 150:
+            errors.push({text: 'La description est trop longue !'});
+            break;
     }
     if (errors.length > 0) {
         const article = await Article.findById(req.params.id).lean()
