@@ -3,9 +3,6 @@ const bcrypt = require('bcrypt');
 const mongooseRole = require('mongoose-role');
 
 const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
-    id: {
-        type: String,
-    },
     fullname: {
         type: String,
         required: true
@@ -13,6 +10,7 @@ const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
@@ -20,6 +18,7 @@ const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
     },
     isValid: {
         type: Boolean,
+        required: true,
     },
     uniqueString: {
         type: String,

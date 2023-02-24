@@ -13,19 +13,39 @@ articlesController.createNewArticle = async (req, res) => {
     const errors = [];
     const { title, content, description } = req.body;
     const formFile = req?.file?.filename;
-    if (title === "" || content === "" || description === "") {
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (title.length < 3) {
-        errors.push({text: 'Le titre est trop court !'});
-    } else if (title.length > 50) {
-        errors.push({text: 'Le titre est trop long !'});
-    } else if (content.length < 15) {
-        errors.push({text: 'Le contenu est trop court !'});
-    } else if (description.length < 3) {
-        errors.push({text: 'La description est trop courte !'});
-    } else if (description.length > 150) {
-        errors.push({text: 'La description est trop longue !'});
+    switch (true) {
+        case title === "" || content === "" || description === "":
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case title.length < 3:
+            errors.push({text: 'Le titre est trop court !'});
+            break;
+        case title.length > 50:
+            errors.push({text: 'Le titre est trop long !'});
+            break;
+        case content.length < 15:
+            errors.push({text: 'Le contenu est trop court !'});
+            break;
+        case description.length < 3:
+            errors.push({text: 'La description est trop courte !'});
+            break;
+        case description.length > 150:
+            errors.push({text: 'La description est trop longue !'});
+            break;
     }
+    // if (title === "" || content === "" || description === "") {
+    //     errors.push({text: `Au moins l'un des champs est vide !`});
+    // } else if (title.length < 3) {
+    //     errors.push({text: 'Le titre est trop court !'});
+    // } else if (title.length > 50) {
+    //     errors.push({text: 'Le titre est trop long !'});
+    // } else if (content.length < 15) {
+    //     errors.push({text: 'Le contenu est trop court !'});
+    // } else if (description.length < 3) {
+    //     errors.push({text: 'La description est trop courte !'});
+    // } else if (description.length > 150) {
+    //     errors.push({text: 'La description est trop longue !'});
+    // }
     if (errors.length > 0) {
         res.render('admin/articles/new-article', {
             errors,
@@ -40,10 +60,10 @@ articlesController.createNewArticle = async (req, res) => {
             description: description,
             formFile,
         });
-        newArticle.user = req.user.id;
-        newArticle.author = req.user.fullname;
-        await newArticle.save();
-        newArticle.id = newArticle._id;
+        const userId = req.user.id;
+        const author = req.user.fullname;
+        newArticle.user = userId;
+        newArticle.author = author;
         await newArticle.save();
         req.flash('success_msg', `L'article a bien été créé !`);
         res.redirect('/admin/articles');
@@ -58,7 +78,7 @@ articlesController.renderArticles = async (req, res) => {
 
 articlesController.renderEditForm = async (req, res) => {
     const article = await Article.findById(req.params.id).lean();
-    if (article.user != req.user.id) {
+    if (article.user != req.user._id) {
         req.flash('error_msg', `Accès non autorisé !`);
     }
     res.render('admin/articles/edit-article', { article });
@@ -125,7 +145,7 @@ articlesController.updateArticle = async (req, res, next) => {
 
 articlesController.deleteArticle = async (req, res) => {
     const image = await Article.findById(req.params.id).lean();
-    const directoryPath = 'src/public/img/uploads/';
+    const directoryPath = 'public/img/uploads/';
     const filenameImg = image.formFile;
     fs.unlink(directoryPath + filenameImg, (err) => {
         if (err) {

@@ -107,8 +107,6 @@ usersController.signUp = async (req, res) => { // TODO Ajouter question secrète
                 const newUser = new User({fullname, email, password, uniqueString, isValid, role: 'user'});
                 newUser.password = await newUser.encrypPassword(password)
                 await newUser.save();
-                newUser.id = newUser._id;
-                await newUser.save();
                 const imgLogo = '/public/img/logo.png'
                 sendEmail(fullname, email, uniqueString, imgLogo);
                 req.flash('info_msg', 'Votre inscription a bien été prise en compte ! Un email de confirmation vous a été envoyé !')
@@ -192,7 +190,7 @@ usersController.isValidated = async (req, res, next) => {
     const user = res.locals.user
     const userId = await User.findById(user?.id)
     if (!user) {
-        req.flash('error_msg', `Vous avez été déconnecté !`);
+        req.flash('error_msg', `Vous n'êtes pas connecté !`);
         res.redirect('/users/signin');
     } else if (userId.isValid === false) {
         req.flash('error_msg', `L'adresse email n'a pas encore été validée !`);
@@ -207,6 +205,8 @@ usersController.renderSignInForm = async (req, res) => {
     if (user) {
         req.flash('info_msg', `Vous êtes déjà connecté !`);
         res.redirect('back');
+    } else if (!req.headers.referer) {
+        res.render('users/signin')
     } else {
         res.render('users/signin', {referer: req.headers.referer.slice(21)});
     }
@@ -223,14 +223,14 @@ usersController.signIn = (req, res, next) => {
                     res.redirect('/users/signin');
                 } else {
                     if (req.body.rememberMe) {
-                        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000;
+                        req.session.cookie.maxAge = 30 * 24 * 60 * 60 * 1000; // 1 month
                     } else {
-                        req.session.cookie.maxAge = 60 * 60 * 1000;
+                        req.session.cookie.maxAge = 60 * 60 * 1000; // 1 hour
                     }
                     if (req.body.referer === '/users/signup' || req.body.referer === '/users/signin') {
                         res.redirect('/')
                     } else {
-                        res.redirect(req.body.referer);
+                        res.redirect(req.body.referer || '/');
                     }
                 }
             })
@@ -278,7 +278,7 @@ usersController.updateUser = async (req, res, next) => {
         })
     } else {
         const username = await User.findOne({fullname: fullname});
-        if (username && username.fullname != req.user.fullname) {
+        if (username && username.fullname != fullname) {
             errors.push({text: `Ce nom est déjà utilisé !`});
             res.render('users/profile', {
                 errors,
@@ -286,8 +286,8 @@ usersController.updateUser = async (req, res, next) => {
                 email,
             })
         } else {
-            let emailUser = await User.findOne({email: email});
-            if (emailUser && emailUser.email != req.user.email) {
+            const emailUser = await User.findOne({email: email});
+            if (emailUser && emailUser.email != email) {
                 errors.push({text: `Cet email est déjà utilisé !`});
                 res.render('users/profile', {
                     errors,
@@ -430,7 +430,7 @@ usersController.forgotPasswordCheckEmail = async (req, res) => {
         } else {
             const imgLogo = '/public/img/logo.png'
             const uniqueString = randStringCheckEmail(128);
-            await User.findByIdAndUpdate(emailUser.id, { uniqueString: uniqueString });
+            await User.findByIdAndUpdate(emailUser._id, { uniqueString: uniqueString });
             sendEmailCheckEmail(email, uniqueString, imgLogo);
             req.flash('info_msg', 'Un email pour réinitialiser votre mot de passe vous a été envoyé !');
             res.redirect('/');
@@ -572,7 +572,7 @@ usersController.resetPassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         let newPassword = await bcrypt.hash(password, salt);
         let uniqueString = "";
-        await User.findByIdAndUpdate(userId.id, { password: newPassword, uniqueString: uniqueString });
+        await User.findByIdAndUpdate(userId._id, { password: newPassword, uniqueString: uniqueString });
         req.flash('success_msg', `Le mot de passe a bien été mis à jour ! Veuillez vous reconnecter !`);
         res.redirect('/users/signin');
     }

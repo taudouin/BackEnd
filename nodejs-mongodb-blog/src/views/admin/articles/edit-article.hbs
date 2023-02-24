@@ -5,7 +5,7 @@
                 <h3>Editer l'article</h3>
             </div>
             <div class="card-body">
-                <form action="/admin/articles/edit/{{article.id}}" method="POST" enctype="multipart/form-data">
+                <form action="/admin/articles/edit/{{article._id}}" method="POST" enctype="multipart/form-data">
                     <div class="form-group mb-2">
                         <input type="text" name="title" class="form-control" placeholder="Titre de l'article" value="{{article.title}}" autofocus>
                     </div>
@@ -22,7 +22,7 @@
                             name="formFile"
                             id="formFile"
                             class="form-control custom-file-input"
-                            accept=".jpg, .jpeg, .png"
+                            accept=".jpg, .jpeg, .png, .webp"
                         />
                         <label for="formFile" class="custom-file-label mb-2">5 Mb maximum</label>
                     </div>

@@ -25,9 +25,7 @@ commentsController.createComment = async (req, res) => {
             articleId: articleId,
         });
         newComment.user = req.user.fullname;
-        newComment.userId = req.user.id;
-        await newComment.save();
-        newComment.id = newComment._id;
+        newComment.userId = req.user._id;
         await newComment.save();
         req.flash('success_msg', 'Le commentaire a bien été créé !');
         res.redirect(`${newComment.articleId}`);
@@ -47,7 +45,7 @@ commentsController.updateComment = async (req, res) => { // TODO faire en popup 
     if (errors.length > 0) {
         const commentId = await Comment.findById(req.params.id)
         const article = await Article.findById(commentId.articleId).lean();
-        const commentData = await Comment.find({articleId: article.id}).sort({createdAt: 'desc'}).lean();
+        const commentData = await Comment.find({articleId: article._id}).sort({createdAt: 'desc'}).lean();
         res.render('article', {
             errors,
             article,

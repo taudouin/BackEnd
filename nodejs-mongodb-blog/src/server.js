@@ -16,7 +16,7 @@ const app = express();
 require('./config/passport');
 
 // Settings
-app.set('port', process.env.PORT || 8081 );
+app.set('port', process.env.WEBSITE_PORT || 8081 );
 app.set('views', path.join(__dirname, 'views'));
 app.engine('hbs', engine({
     defaultLayout: 'main',
@@ -89,5 +89,9 @@ app.use(require('./routes/users.routes'));
 // Static Files
 app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/img', express.static(path.join(__dirname, 'public', 'img', 'uploads')));
+
+app.use((req, res) => {
+    res.status(404).render('404')
+});
 
 module.exports = app;

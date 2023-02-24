@@ -24,16 +24,32 @@
               <td>{{author}}</td>
               <td>{{moment updatedAt format="DD/MM/YYYY"}} à {{moment updatedAt format="HH:mm"}}</td>
               <td class="text-center">
-                <a href="/admin/articles/edit/{{_id}}"><i
-                    class="fa fa-edit"
-                    aria-hidden="true"
+                <a href="/admin/articles/edit/{{_id}}" class="fa fa-edit me-2" aria-hidden="true"
                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer l'article"
-                  ></i></a>
-                <a href="/admin/articles/delete/{{_id}}"
-                  onclick="return confirm('Voulez-vous vraiment supprimer cet article ?');"
-                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer l'article">
-                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                </a>
+                  ></a>
+                <!-- Button trigger modal -->
+                <span data-bs-toggle="modal" data-bs-target="#modalArticle{{_id}}">
+                  <button type="button" class="btn mb-1 fa-solid fa-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer l'article">
+                </button></span>
+
+                <!-- Modal -->
+                <div class="modal fade" id="modalArticle{{_id}}" tabindex="-1" aria-labelledby="modalLabelArticle" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h2 class="modal-title fs-5" id="modalLabelArticle">{{title}}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Voulez-vous vraiment supprimer cet article ?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <a href="/admin/articles/delete/{{_id}}" type="button" class="btn btn-danger">Supprimer</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           {{/each}}

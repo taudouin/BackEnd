@@ -5,23 +5,42 @@
                 <h3>Modifier son profil</h3>
             </div>
             <div class="card-body">
-                <form action="/users/profile/{{user.id}}" method="POST">
+                <form action="/users/profile/{{user._id}}" method="POST">
                     <div class="form-group mb-2">
                         <input type="text" name="fullname" class="form-control" placeholder="Nom complet" value="{{user.fullname}}" autofocus>
                     </div>
                     <div class="form-group mb-2">
                         <input type="email" name="email" class="form-control" placeholder="Adresse email" value="{{user.email}}">
                     </div>
-                   <a href="/users/change-password/{{user.id}}" class="change-password">Changer mot de passe</a>
+                   <a href="/users/change-password/{{user._id}}" class="change-password">Changer mot de passe</a>
                     <div class="form-group d-md-block justify-content-center mt-3">
                         <button class="col-2 btn btn-primary btn-block me-3 btn-save" type="submit"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Mettre à jour l'utilisateur">
                             <i class="fa-solid fa-floppy-disk"></i>
                         </button>
-                        <a href="/users/delete-user/{{user.id}}" class="col-2 btn btn-outline-danger btn-block ms-3"
-                        type="button" onclick="return confirm('Voulez-vous vraiment supprimer votre compte ?');"
-                        data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer l'utilisateur">
-                            <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                        </a>
+                        <!-- Button trigger modal -->
+                        <span data-bs-toggle="modal" data-bs-target="#modalUserProfile{{user._id}}">
+                            <button type="button" class="col-2 btn btn-outline-danger btn-block ms-3" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer l'utilisateur">
+                                <i class="fa-solid fa-trash" aria-hidden="true"></i>
+                        </button></span>
+
+                        <!-- Modal -->
+                        <div class="modal fade" id="modalUserProfile{{user._id}}" tabindex="-1" aria-labelledby="modalLabelUser" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h2 class="modal-title fs-5" id="modalLabelUserProfile">{{user.fullname}}</h2>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Voulez-vous vraiment supprimer cet utilisateur ?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                        <a href="/users/delete/{{user._id}}" type="button" class="btn btn-danger">Supprimer</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </form>
             </div>

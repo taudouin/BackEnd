@@ -4,7 +4,7 @@ const hasAccess = function hasAccess(accessLevel) {
             return next()
         }
         return req.flash('error_msg', `Accès non autorisé !`),
-        res.redirect('back');
+        res.redirect('/');
     }
 }
 

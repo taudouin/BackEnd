@@ -1,13 +1,13 @@
 <section class="container my-5">
-    <input type="text" value="{{article.id}}">
     <article class="card">
         <div class="px-lg-5">
-            <img src="/img/{{article.formFile}}" class="card-img-top px-lg-5" alt="{{article.formFile}}" />
+            <img src="/img/{{article.formFile}}" class="card-img-top px-lg-5" alt="{{article.formFile}}" width="100%" height="100%" />
         </div>
         <div class="card-body">
             <h2 class="fw-bold">{{article.title}}</h2>
             <p class="fst-italic">Par {{article.author}}, le {{moment article.createdAt format="DD/MM/YYYY"}} à {{moment article.createdAt format="HH:mm"}}</p>
-            <textarea id="content-article" class="form-control" style="height: 80vh" disabled>{{article.content}}</textarea>
+            <label for="textarea-content">
+            <textarea id="content-article" class="form-control" id="textarea-content" style="height: 80vh" disabled>{{article.content}}</textarea>
         </div>
     </article>
 
@@ -20,39 +20,60 @@
 
             {{#ifCond ../user.id userId}}
             <div class="d-flex ms-auto">
-                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom" aria-controls="offcanvasBottom">
-                    <button type="button" class="btn mt-0 me-0" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer son commentaire">
-                        <i class="fa fa-edit" aria-hidden="true"></i>
+                <span data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom{{_id}}" aria-controls="offcanvasBottom">
+                    <button type="button" class="btn mt-1 fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer son commentaire"></button>
+                </span>
+                <!-- Button trigger modal -->
+                <span data-bs-toggle="modal" data-bs-target="#modalComment{{_id}}">
+                    <button type="button" class="btn text-nowrap fa-solid fa-trash mt-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer son commentaire">
+                        {{!-- <i class="fa-solid fa-trash" aria-hidden="true"></i> --}}
                     </button>
                 </span>
-                <a href="/article/comment/{{_id}}" type="button" class="btn text-nowrap"
-                  onclick="return confirm('Voulez-vous vraiment supprimer ce commentaire ? {{_id}}');" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer son commentaire">
-                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                </a>
 
-                <form action="/article/comment/{{_id}}" method="POST" enctype="application/x-www-form-urlencoded"> <!-- TODO Update seulement le dernier ID et non celui-ci -->
-                    <div class="offcanvas offcanvas-bottom bg-light bg-opacity-75" data-bs-scroll="true" tabindex="-1" id="offcanvasBottom" aria-labelledby="offcanvasBottomLabel">
+                <!-- Modal -->
+                <div class="modal fade" id="modalComment{{_id}}" tabindex="-1" aria-labelledby="modalLabelComment" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h2 class="modal-title fs-5" id="modalLabelComment">{{user}}, le {{moment createdAt format="DD/MM/YYYY"}} à {{moment createdAt format="HH:mm"}}</h2>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                Voulez-vous vraiment supprimer cet utilisateur ?
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                <a href="/users/delete/{{user._id}}" type="button" class="btn btn-danger">Supprimer</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form action="/article/comment/{{_id}}" method="POST" enctype="application/x-www-form-urlencoded">
+                    <div class="offcanvas offcanvas-bottom bg-light bg-opacity-75" data-bs-scroll="true" tabindex="-1" id="offcanvasBottom{{_id}}" aria-labelledby="offcanvasBottomLabel">
                         <div class="offcanvas-header">
-                            <h5 class="offcanvas-title" id="offcanvasBottomLabel">Modification du commentaire {{_id}}</h5>
+                            <h5 class="offcanvas-title" id="offcanvasBottomLabel">Modification du commentaire</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
                         </div>
                         <div class="form-group offcanvas-body small text-center">
-                            <textarea class="col-12 border border-secondary p-2 comment-textarea" name="comment">{{comment}}</textarea>
+                            <label class="d-grid">
+                                <textarea class="col-12 border border-secondary p-2 comment-textarea" name="comment">{{comment}}</textarea>
+                            </label>
                             <button class="btn btn-primary btn-block mt-4" type="submit" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Modifier le commentaire">
                                 Modifier
                             </button>
                         </div>
                     </div>
                 </form>
-
-                {{!-- <button type="button" class="btn btn-outline-secondary text-nowrap" hidden>
-                    Modifier
-                </button> --}}
             </div>
             {{/ifCond}}
+
         </div>
-        <textarea class="col-12 border border-secondary border-top-0 p-2 comment-textarea" readonly>{{comment}}</textarea>
-        <input type="text" value="{{_id}}">
+        <section class="d-grid">
+        <label>
+            <textarea class="col-12 border border-secondary border-top-0 p-2 comment-textarea" readonly>{{comment}}</textarea>
+        </label>
+        </section>
     </section>
     {{/each}}
 
@@ -85,11 +106,11 @@
 
     <hr class="mt-5 mb-3">
     {{#if user}}
-    <form class="col-md-12 mx-auto" action="/article/{{article.id}}" method="POST" enctype="application/x-www-form-urlencoded">
+    <form class="col-md-12 mx-auto" action="/article/{{article._id}}" method="POST" enctype="application/x-www-form-urlencoded">
         <h4 class="text-center">Laisser un commentaire</h4>
-        <input type="text" name="articleId" value="{{article.id}}" hidden>
-        <div class="form-group mb-2">
-            <textarea class="col-12 p-3" name="comment"></textarea>
+        <input type="text" name="articleId" value="{{article._id}}" hidden>
+        <div class="form-group mb-2 d-grid">
+            <label for="new-comment-textarea"><textarea class="col-12 p-3" id="new-comment-textarea" name="comment"></textarea>
         </div>
         <div class="form-group text-center">
             <button class="btn btn-primary btn-block" type="submit"  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Envoyer le commentaire">

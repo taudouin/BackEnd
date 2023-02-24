@@ -4,30 +4,30 @@
         <div class="card mb-3 mx-auto" style="max-width: 800px;">
             <div class="row g-0">
                 <div class="col-md-4 bg-secondary rounded-start">
-                    <img src="https://images.pexels.com/photos/4210787/pexels-photo-4210787.jpeg" class="d-none d-md-block img-fluid rounded-start h-100" alt="...">
+                    <img src="/public/img/contact.jpeg" class="d-none d-md-block img-fluid rounded-start h-100" alt="contact">
                 </div>
                 <div class="col-md-8">
                     <div class="card-body">
                         <h5 class="card-title mb-5">Formulaire de contact</h5>
                         <div class="card-text">
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="floatingInput" name="name" value="{{name}}" placeholder="Votre nom">
-                                <label for="floatingInput">Votre nom</label>
+                                <input type="text" class="form-control" id="floatingInputName" name="name" value="{{name}}" placeholder="Votre nom">
+                                <label for="floatingInputName">Votre nom</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="email" class="form-control" id="floatingInput" name="email" value="{{email}}" placeholder="name@example.com">
-                                <label for="floatingInput">Votre adresse email</label>
+                                <input type="email" class="form-control" id="floatingInputEmail" name="email" value="{{email}}" placeholder="name@example.com">
+                                <label for="floatingInputEmail">Votre adresse email</label>
                             </div>
 
                             <div class="form-floating mb-3">
-                                <input type="text" class="form-control" id="floatingInput" name="subject" value="{{subject}}" placeholder="Sujet de votre message">
-                                <label for="floatingInput">Sujet du message</label>
+                                <input type="text" class="form-control" id="floatingInputMessage" name="subject" value="{{subject}}" placeholder="Sujet de votre message">
+                                <label for="floatingInputMessage">Sujet du message</label>
                             </div>
 
                             <div class="form-floating">
-                                <textarea class="form-control" placeholder="Votre commentaire" name="content" id="floatingTextarea2" style="height: 100px">{{content}}</textarea>
-                                <label for="floatingTextarea2">Contenu du message</label>
+                                <textarea class="form-control" placeholder="Votre commentaire" name="content" id="floatingTextarea" style="height: 100px">{{content}}</textarea>
+                                <label for="floatingTextarea">Contenu du message</label>
                             </div>
 
                             <div class="text-center mt-5">
