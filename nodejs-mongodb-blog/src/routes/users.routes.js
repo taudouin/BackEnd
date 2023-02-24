@@ -24,13 +24,14 @@ const {
 } = require('../controllers/users.controller');
 
 const {isAuthenticated} = require('../helpers/auth');
+const hasAccess = require('../helpers/hasAccess');
 
 // New users
 router.get('/users/signup', renderSignUpForm);
 router.post('/users/signup', signUp);
 
 // All users
-router.get('/admin/users/all-users', isValidated, isAuthenticated, renderUsers);
+router.get('/admin/users/all-users', isValidated, isAuthenticated, hasAccess('admin'), renderUsers);
 
 // Log in
 router.get('/users/signin', renderSignInForm);
@@ -56,7 +57,7 @@ router.post('/users/reset-password/:uniqueString', resetPassword);
 
 // Delete user
     // By the admin
-router.get('/users/delete/:id', isValidated, isAuthenticated, deleteUser);
+router.get('/users/delete/:id', isValidated, isAuthenticated, hasAccess('admin'), deleteUser);
     // By the user
 router.get('/users/delete-user/:id', isValidated, isAuthenticated, deleteUserByUser);
 

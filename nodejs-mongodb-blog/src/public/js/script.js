@@ -161,14 +161,17 @@ const compare = function(ids, asc){
 
   const tbody = document.querySelector('tbody');
   const thx = document.querySelectorAll('th');
-  const trxb = tbody.querySelectorAll('tr');
-  thx.forEach(function(th){
-    th.addEventListener('click', function(){
-      let tableRow = Array.from(trxb).sort(compare(Array.from(thx).indexOf(th), this.asc = !this.asc));
-      tableRow.forEach(function(tr){
-         tbody.appendChild(tr)
-      });
-    })
-  });
+  if (tbody) {
+    const trxb = tbody.querySelectorAll('tr');
+    thx.forEach(function(th){
+      th.addEventListener('click', function(){
+        let tableRow = Array.from(trxb).sort(compare(Array.from(thx).indexOf(th), this.asc = !this.asc));
+        tableRow.forEach(function(tr){
+          tbody.appendChild(tr)
+        });
+      })
+    });
+  }
+  
 
   /* Order tables END */

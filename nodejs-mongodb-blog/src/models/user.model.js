@@ -1,10 +1,8 @@
 const { Schema, model } = require('mongoose');
 const bcrypt = require('bcrypt');
+const mongooseRole = require('mongoose-role');
 
 const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
-    id: {
-        type: String,
-    },
     fullname: {
         type: String,
         required: true
@@ -12,6 +10,7 @@ const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
     email: {
         type: String,
         required: true,
+        unique: true,
     },
     password: {
         type: String,
@@ -19,6 +18,7 @@ const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
     },
     isValid: {
         type: Boolean,
+        required: true,
     },
     uniqueString: {
         type: String,
@@ -28,14 +28,14 @@ const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
     }
 )
 
-// UserSchema.plugin(require('mongoose-role'), {
-// 	roles: ['public', 'user', 'admin'],
-//     accessLevels: {
-//     'public': ['public', 'user', 'admin'],
-//     'user': ['user', 'admin'],
-//     'admin': ['admin']
-//   }
-// });
+UserSchema.plugin(mongooseRole, {
+    roles: ['public', 'user', 'admin'],
+    accessLevels: {
+        'public': ['public', 'user', 'admin'],
+        'user': ['user', 'admin'],
+        'admin': ['admin']
+    }
+});
 
 UserSchema.methods.encrypPassword = async password => {
     const salt = await bcrypt.genSalt(10);

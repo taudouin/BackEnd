@@ -13,7 +13,7 @@
                         <textarea id="content" name="content" class="form-control" placeholder="Contenu de l'article"></textarea>
                     </div>
                     <div class="form-group mb-3">
-                        <input type="text" name="description" class="form-control" placeholder="Description de l'article">
+                        <input type="text" name="description" class="form-control" minlength="3" maxlength="150" placeholder="Description de l'article">
                     </div>
                     <div class="mt-3 w-50 custom-file">
                         <input
@@ -21,7 +21,7 @@
                             name="formFile"
                             id="formFile"
                             class="form-control custom-file-input"
-                            accept=".jpg, .jpeg, .png"
+                            accept=".jpg, .jpeg, .png, .webp"
                         />
                         <label for="formFile" class="custom-file-label mb-2">5 Mb maximum</label>
                     </div>

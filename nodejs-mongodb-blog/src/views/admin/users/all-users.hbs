@@ -24,11 +24,29 @@
               <td>{{email}}</td>
               <td>{{moment updatedAt format="DD/MM/YY"}} à {{moment updatedAt format="HH:mm"}}</td>
               <td class="text-center">
-                <a href="/users/delete/{{_id}}"
-                  onclick="return confirm('Voulez-vous vraiment supprimer cet utilisateur ?');"
-                  data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer l'utilisateur">
-                    <i class="fa-solid fa-trash" aria-hidden="true"></i>
-                </a>
+                <!-- Button trigger modal -->
+                <span data-bs-toggle="modal" data-bs-target="#modalUser{{_id}}">
+                  <button type="button" class="btn mb-1 fa-solid fa-trash" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer l'utilisateur">
+                </button></span>
+
+                <!-- Modal -->
+                <div class="modal fade" id="modalUser{{_id}}" tabindex="-1" aria-labelledby="modalLabelUser" aria-hidden="true">
+                  <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <h2 class="modal-title fs-5" id="modalLabelUser">{{fullname}}</h2>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                      </div>
+                      <div class="modal-body">
+                        Voulez-vous vraiment supprimer cet utilisateur ?
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <a href="/users/delete/{{_id}}" type="button" class="btn btn-danger">Supprimer</a>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </td>
             </tr>
           {{/each}}

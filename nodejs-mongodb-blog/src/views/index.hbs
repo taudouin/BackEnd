@@ -8,7 +8,7 @@
     <div class="carousel-inner">
       {{#each articlesCarousel}}
       <a href="/article/{{_id}}">
-      <div class="carousel-item {{#if @first }}active{{/if}}" data-bs-interval="4000">
+      <div class="carousel-item {{#if @first}}active{{/if}}" data-bs-interval="4000">
         <img src="/img/{{formFile}}" class="d-block w-100" alt="{{formFile}}">
         <div class="carousel-caption d-none d-md-block">
           <h5 class="fw-bold">{{title}}</h5>
@@ -27,15 +27,16 @@
       <span class="visually-hidden">Suivant</span>
     </button>
   </div>
-  <div class="row row-cols-1 row-cols-md-3 g-4 mb-5">
+  <section class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
     {{#each articles}}
-      <div class="col">
+      <article class="col">
         <a href="/article/{{_id}}">
           <div class="card h-100">
             <img
               src="/img/{{formFile}}"
               class="card-img-top"
               alt="{{formFile}}"
+              width="100%" height="100%"
             />
             <div class="card-body">
               <h5 class="card-title fw-bold">{{title}}</h5>
@@ -46,7 +47,34 @@
             </div>
           </div>
         </a>
-      </div>
+      </article>
     {{/each}}
-  </div>
+  </section>
 </div>
+
+{{#ifDiff count 10}}
+{{else}}
+<div class="d-flex justify-content-center">
+    <ul class="pagination">
+        {{#paginate pagination type="first"}}
+        <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angles-left"></i></a></li>
+        {{/paginate}}
+
+        {{#paginate pagination type="previous"}}
+        <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angle-left"></i></a></li>
+        {{/paginate}}
+
+        {{#paginate pagination type="middle" limit=pagination.pageCount}}
+        <li {{#if active}} class="pageNumber active" {{/if}}><a class="page-link" href="?p={{n}}">{{n}}</a></li>
+        {{/paginate}}
+
+        {{#paginate pagination type="next"}}
+        <li {{#if disabled}} class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angle-right"></i></a></li>
+        {{/paginate}}
+
+        {{#paginate pagination type="last"}}
+        <li {{#if disabled}}class="pageNumber disabled" {{/if}}><a class="page-link" href="?p={{n}}"><i class="fa-solid fa-angles-right"></i></a></li>
+        {{/paginate}}
+    </ul>
+</div>
+{{/ifDiff}}

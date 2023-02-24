@@ -13,12 +13,12 @@ contactController.sendContactForm = (req, res) => {
 
     // Create a SMTP transporter object
     let transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
+        host: EMAIL_SMTP_SERVER,
+        port: PORT_SMTP_SERVER,
         secure: false,
         auth: {
-            user: 't.audouin@gmail.com',
-            pass: 'tlyjndpyrncrydvg'
+            user: EMAIL_USER,
+            pass: EMAIL_PASSWORD
         },
         tls: {
             rejectUnauthorized: false
@@ -30,26 +30,58 @@ contactController.sendContactForm = (req, res) => {
     const { name, subject, content } = req.body;
     const email = req.body.email.toLowerCase();
 
-    if (name === "" || email === "" || subject === "" || content === "" ) { // TODO regex name subject
-        errors.push({text: `Au moins l'un des champs est vide !`});
-    } else if (name.length < 3) {
-        errors.push({text: 'Le nom est trop court !'});
-    } else if (name.length > 30) {
-        errors.push({text: 'Le nom est trop long !'});
-    } else if (email.length < 8) {
-        errors.push({text: `L'adresse email est trop courte !`});
-    } else if (email.length > 40) {
-        errors.push({text: `L'adresse email est trop longue !`});
-    } else if (!validator.isEmail(email)) {
-        errors.push({text: `L'adresse email n'est pas conforme !`});
-    } else if (subject.length < 3) {
-        errors.push({text: `Le sujet du message est trop court !`});
-    } else if (subject > 40) {
-        errors.push({text: `Le sujet du message est trop long !`});
-    } else if (content.length < 10) {
-        errors.push({text: `Le contenu du message est trop court !`});
-    } else if (content > 500) {
-        errors.push({text: `Le contenu du message est trop long !`})
+    // if (name === "" || email === "" || subject === "" || content === "") { // TODO regex name subject
+    //     errors.push({text: `Au moins l'un des champs est vide !`});
+    // } else if (name.length < 3) {
+    //     errors.push({text: 'Le nom est trop court !'});
+    // } else if (name.length > 30) {
+    //     errors.push({text: 'Le nom est trop long !'});
+    // } else if (email.length < 8) {
+    //     errors.push({text: `L'adresse email est trop courte !`});
+    // } else if (email.length > 40) {
+    //     errors.push({text: `L'adresse email est trop longue !`});
+    // } else if (!validator.isEmail(email)) {
+    //     errors.push({text: `L'adresse email n'est pas conforme !`});
+    // } else if (subject.length < 3) {
+    //     errors.push({text: `Le sujet du message est trop court !`});
+    // } else if (subject > 40) {
+    //     errors.push({text: `Le sujet du message est trop long !`});
+    // } else if (content.length < 10) {
+    //     errors.push({text: `Le contenu du message est trop court !`});
+    // } else if (content.length > 500) {
+    //     errors.push({text: `Le contenu du message est trop long !`})
+    // }
+    switch (true) {
+        case name === "" || email === "" || subject === "" || content === "":
+            errors.push({text: `Au moins l'un des champs est vide !`});
+            break;
+        case name.length < 3:
+            errors.push({text: 'Le nom est trop court !'});
+            break;
+        case name.length > 30:
+            errors.push({text: 'Le nom est trop long !'});
+            break;
+        case email.length < 8:
+            errors.push({text: `L'adresse email est trop courte !`});
+            break;
+        case email.length > 40:
+            errors.push({text: `L'adresse email est trop longue !`});
+            break;
+        case !validator.isEmail(email):
+            errors.push({text: `L'adresse email n'est pas conforme !`});
+            break;
+        case subject.length < 3:
+            errors.push({text: `Le sujet du message est trop court !`});
+            break;
+        case subject > 40:
+            errors.push({text: `Le sujet du message est trop long !`});
+            break;
+        case content.length < 10:
+            errors.push({text: `Le contenu du message est trop court !`});
+            break;
+        case content.length > 500:
+            errors.push({text: `Le contenu du message est trop long !`})
+            break;
     }
     if (errors.length > 0) {
         res.render('contact', {
@@ -71,7 +103,6 @@ contactController.sendContactForm = (req, res) => {
                 console.log(err);
             } else {
                 console.log('Email sent: ' + info.response);
-                // console.log('Preview URL: %s', nodemailer.getTestMessageUrl(info));
                 req.flash('success_msg', `Le message a bien été envoyé !`);
                 res.redirect('back');
             }
