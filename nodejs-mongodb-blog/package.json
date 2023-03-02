@@ -15,7 +15,7 @@
     "connect-flash": "^0.1.1",
     "express": "^4.18.2",
     "express-back": "^0.0.2",
-    "express-handlebars": "^6.0.6",
+    "express-handlebars": "^6.0.7",
     "express-session": "^1.17.3",
     "handlebars-paginate": "^0.1.0",
     "helmet": "^6.0.1",
