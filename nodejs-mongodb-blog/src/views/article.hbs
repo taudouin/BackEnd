@@ -5,7 +5,7 @@
         </div>
         <div class="card-body">
             <h2 class="fw-bold">{{article.title}}</h2>
-            <p class="fst-italic">Par {{article.author}}, le {{moment article.createdAt format="DD/MM/YYYY"}} à {{moment article.createdAt format="HH:mm"}}</p>
+            <p class="fst-italic">Par {{article.user.fullname}}, le {{moment article.createdAt format="DD/MM/YYYY"}} à {{moment article.createdAt format="HH:mm"}}</p>
             <label for="textarea-content">
             <textarea id="content-article" class="form-control" id="textarea-content" style="height: 80vh" disabled>{{article.content}}</textarea>
         </div>
@@ -18,7 +18,7 @@
         <div class="d-flex align-items-center highlight-toolbar bg-secondary bg-opacity-25 ps-3 pe-2 py-1 border border-secondary border-bottom-0 rounded-top">
             <small class="font-monospace text-muted">{{user}}, le {{moment createdAt format="DD/MM/YYYY"}} à {{moment createdAt format="HH:mm"}}</small>
 
-            {{#ifCond ../user.id userId}}
+            {{#ifCond ../user._id userId}}
             <div class="d-flex ms-auto">
                 <span data-bs-toggle="offcanvas" data-bs-target="#offcanvasBottom{{_id}}" aria-controls="offcanvasBottom">
                     <button type="button" class="btn mt-1 fa fa-edit" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer son commentaire"></button>
@@ -26,7 +26,6 @@
                 <!-- Button trigger modal -->
                 <span data-bs-toggle="modal" data-bs-target="#modalComment{{_id}}">
                     <button type="button" class="btn text-nowrap fa-solid fa-trash mt-1" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Supprimer son commentaire">
-                        {{!-- <i class="fa-solid fa-trash" aria-hidden="true"></i> --}}
                     </button>
                 </span>
 

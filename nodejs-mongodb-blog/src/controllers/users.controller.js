@@ -15,7 +15,7 @@ usersController.renderSignUpForm = (req, res) => {
 
 usersController.signUp = async (req, res) => { // TODO Ajouter question secrète avec réponse
     const errors = [];
-    const { fullname, password, confirm_password } = req.body;
+    const { fullname, password, confirm_password, isHuman } = req.body;
     const email = req.body.email.toLowerCase();
     const uniqueString = randString(128);
     const isValid = false;
@@ -86,6 +86,9 @@ usersController.signUp = async (req, res) => { // TODO Ajouter question secrète
         case password != confirm_password:
             errors.push({text: 'Les mots de passe ne correspondent pas !'});
             break;
+        case isHuman != "":
+            errors.push({text: 'Vous n\'êtes pas humain !'});
+            break;
     }
     if (errors.length > 0) {
         res.render('users/signup', {
@@ -119,9 +122,8 @@ usersController.signUp = async (req, res) => { // TODO Ajouter question secrète
 randString = (length) => {
     let result           = '';
     let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
     for ( let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return result;
 }
@@ -188,7 +190,7 @@ usersController.verifyEmail = async (req, res) => {
 
 usersController.isValidated = async (req, res, next) => {
     const user = res.locals.user
-    const userId = await User.findById(user?.id)
+    const userId = await User.findById(user?._id)
     if (!user) {
         req.flash('error_msg', `Vous n'êtes pas connecté !`);
         res.redirect('/users/signin');
@@ -241,7 +243,8 @@ usersController.signIn = (req, res, next) => {
 
 usersController.renderEditForm = async (req, res) => {
     const user = await User.findById(req.params.id).lean();
-    res.render('users/profile', { user });
+    const userConnected = res.locals.user;
+    res.render('users/profile', { user, userConnected });
 };
 
 usersController.updateUser = async (req, res, next) => {
@@ -378,8 +381,13 @@ usersController.changePassword = async (req, res) => {
         const salt = await bcrypt.genSalt(10);
         let newPassword = await bcrypt.hash(password, salt);
         await User.findByIdAndUpdate(req.params.id, { password: newPassword });
-        req.flash('success_msg', `Le mot de passe a bien été mis à jour ! Veuillez vous reconnecter !`);
-        res.redirect('/users/signin');
+        req.logout((err) => {
+            if (err) {
+                return next(err)
+            }
+            req.flash('success_msg', `Le mot de passe a bien été mis à jour ! Veuillez vous reconnecter !`);
+            res.redirect('/users/signin');
+        });
     }
 };
 
@@ -441,9 +449,8 @@ usersController.forgotPasswordCheckEmail = async (req, res) => {
 randStringCheckEmail = (length) => {
     let result           = '';
     let characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-    let charactersLength = characters.length;
     for ( let i = 0; i < length; i++ ) {
-        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
     }
     return result;
 }
@@ -513,7 +520,7 @@ usersController.resetPassword = async (req, res) => {
     const errors = [];
     let { password, confirm_password } = req.body;
     const userId = await User.findOne(req.params).lean();
-    const matchNewPassword = await bcrypt.compare(password, userId.password);
+    const matchNewPassword = await userId.compare(password, userId.password);
 
     // if (password === "" || confirm_password === "") {
     //     errors.push({text: `Au moins l'un des champs est vide !`});
@@ -579,8 +586,38 @@ usersController.resetPassword = async (req, res) => {
 };
 
 usersController.renderUsers = async (req, res) => {
-    const users = await User.find().sort({fullname: 'desc'}).lean();
-    res.render('admin/users/all-users', { users });
+    const perPage = 10; // Number of users in one page
+    const page = req.query.p;
+    User
+    .find({})
+    .skip((perPage * page) - perPage)
+    .limit(perPage)
+    .sort({role: 'asc'})
+    .lean()
+    .exec((err, users) => {
+        User.countDocuments().lean().exec((err, count) => {
+            if (err)
+                return next(err)
+            if (page > 1) {
+                res.render('admin/users/all-users', {
+                    pagination: {
+                        page: page || 1,
+                        pageCount: Math.ceil(count / perPage)
+                    },
+                    users: users,
+                })
+            } else {
+                res.render('admin/users/all-users', {
+                    pagination: {
+                        page: page || 1,
+                        pageCount: Math.ceil(count / perPage)
+                    },
+                    users: users,
+                    count
+                })
+            }
+        })
+    })
 };
 
 usersController.deleteUser = (req, res) => {
@@ -589,7 +626,7 @@ usersController.deleteUser = (req, res) => {
             console.log(`Erreur lors de la suppression de l'utilisateur :` + err);
         } else {
             req.flash('success_msg', `L'utilisateur a bien été supprimé !`);
-            res.redirect("/users/signup");
+            res.redirect('back');
         }
     })
 };
@@ -615,7 +652,7 @@ usersController.logout = (req, res, next) => {
             return next(err)
         }
         req.flash('success_msg', 'Vous êtes bien déconnecté !');
-        res.redirect(req.headers.referer);
+        res.redirect('/users/signin');
     });
 
 };

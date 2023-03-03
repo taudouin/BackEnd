@@ -26,8 +26,13 @@
                 aria-expanded="false"
               >
                 Bienvenue
+                {{#ifCond user._id connect.user}}
                 {{user.fullname}}
+                {{else}}
+                PIRATE
+                {{/ifCond}}
               </a>
+                {{#ifCond user._id connect.user}}
               <ul class="dropdown-menu">
                 {{#ifAdmin user.role}}
                 <li><a class="dropdown-item" href="/admin/articles"><i
@@ -45,13 +50,15 @@
                 {{/ifAdmin}}
                 <li><a
                     class="dropdown-item"
-                    href="/users/profile/{{user.id}}"
+                    href="/users/profile/{{user._id}}"
                   ><i class="fa-solid fa-user-gear me-2"></i>Profil utilisateur</a></li>
                 <li><hr class="dropdown-divider" /></li>
                 <li><a class="dropdown-item" href="/users/logout"><i
                       class="fa-solid fa-right-from-bracket me-2"
                     ></i>Se déconnecter</a></li>
               </ul>
+                {{else}}
+                {{/ifCond}}
             </li>
           {{else}}
             <li class="nav-item">
