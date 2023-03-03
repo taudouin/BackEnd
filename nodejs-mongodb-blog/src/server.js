@@ -36,16 +36,14 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
     cookie: {
-        secure: false,
-        httpOnly: false,
+        secure: true,
+        httpOnly: true,
         sameSite: 'strict',
     },
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(helmet({
-    contentSecurityPolicy: false
-}));
+app.use(helmet());
 app.use(flash());
 app.use(back());
 
