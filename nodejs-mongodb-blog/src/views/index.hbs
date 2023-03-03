@@ -1,4 +1,6 @@
 <div class="container mb-5">
+
+  <!-- Carousel -->
   <div id="carouselCaptions" class="carousel slide mb-5" data-bs-ride="carousel">
     <div class="carousel-indicators">
       <button type="button" data-bs-target="#carouselCaptions" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
@@ -27,6 +29,8 @@
       <span class="visually-hidden">Suivant</span>
     </button>
   </div>
+
+  <!-- Articles list -->
   <section class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
     {{#each articles}}
       <article class="col">
@@ -52,6 +56,7 @@
   </section>
 </div>
 
+<!-- Pagination -->
 {{#ifDiff count 10}}
 {{else}}
 <div class="d-flex justify-content-center">

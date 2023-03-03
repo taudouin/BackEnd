@@ -4,7 +4,7 @@ const maxSize = 5 * 1024 * 1024;
 
 //Setting storage engine
 const storageEngine = multer.diskStorage({
-  destination: "public/img/uploads",
+  destination: "src/public/img/uploads",
   filename: (req, file, cb) => {
     cb(null, `${Date.now()}--${(file.originalname.split(' ')).join('_')}`);
   },

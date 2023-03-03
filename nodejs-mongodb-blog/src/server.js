@@ -2,7 +2,8 @@ const express = require('express');
 const { engine } = require('express-handlebars');
 const path = require('path');
 const morgan = require('morgan');
-const Handlebars = require("handlebars");
+const Handlebars = require('handlebars');
+const helmet = require('helmet');
 const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
@@ -38,18 +39,20 @@ app.use(session({
         secure: false,
         httpOnly: false,
         sameSite: 'strict',
-        // maxAge: 60 * 60 * 1000
     },
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(helmet({
+    contentSecurityPolicy: false
+}));
 app.use(flash());
 app.use(back());
 
 // RegisterHelpers
 MomentHandler.registerHelpers(Handlebars);
 Handlebars.registerHelper('ifCond', function (v1, v2, options) {
-    if (v1 === v2) {
+    if (v1 == v2) {
         return options.fn(this);
     }
     return options.inverse(this);
@@ -77,6 +80,7 @@ app.use((req, res, next) => {
     res.locals.error_msg = req.flash('error_msg');
     res.locals.error = req.flash('error');
     res.locals.user = req.user || null;
+    res.locals.connect = req.session.passport;
     next();
 });
 
@@ -91,7 +95,7 @@ app.use('/public', express.static(path.join(__dirname, 'public')));
 app.use('/img', express.static(path.join(__dirname, 'public', 'img', 'uploads')));
 
 app.use((req, res) => {
-    res.status(404).render('404')
+    res.status(404).render('404');
 });
 
 module.exports = app;

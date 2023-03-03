@@ -11,9 +11,11 @@ const CommentSchema = new Schema ({
     },
     userId: {
         type: String,
+        required: true,
     },
     articleId: {
-        type: String
+        type: String,
+        required: true,
     },
 }, {
     timestamps: true

@@ -13,11 +13,8 @@ const ArticleSchema = new Schema ({
         type: String,
     },
     user: {
-        type: String,
-        required: true
-    },
-    author: {
-        type: String,
+        type: Schema.Types.ObjectId,
+        ref: 'User',
         required: true
     },
     formFile: {

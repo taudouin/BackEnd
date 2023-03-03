@@ -37,7 +37,7 @@ UserSchema.plugin(mongooseRole, {
     }
 });
 
-UserSchema.methods.encrypPassword = async password => {
+UserSchema.methods.encrypPassword = async function (password) {
     const salt = await bcrypt.genSalt(10);
     return await bcrypt.hash(password, salt);
 }

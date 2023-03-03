@@ -23,7 +23,7 @@ passport.use(new LocalStrategy({
 }));
 
 passport.serializeUser((user, done) => {
-    done(null, user.id);
+    done(null, user._id);
 });
 
 passport.deserializeUser((id, done) => {
@@ -34,7 +34,7 @@ passport.deserializeUser((id, done) => {
             const userInformation = {
                 fullname: user.fullname,
                 email: user.email,
-                id: user.id,
+                _id: user.id,
                 role: user.role
         }
         done(err, userInformation);
