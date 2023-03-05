@@ -24,7 +24,12 @@ commentsController.createComment = async (req, res) => {
             comment: comment,
             articleId: articleId,
         });
-        newComment.userId = req.user._id;
+        const user = res.locals.connect;
+        console.log(user.user);
+        console.log(req.user._id);
+        console.log(req.user.fullname);
+        newComment.userId = user.user;
+        newComment.user = req.user.fullname;
         await newComment.save();
         req.flash('success_msg', 'Le commentaire a bien été créé !');
         res.redirect(`${newComment.articleId}`);

@@ -1,10 +1,12 @@
-<section class="container mb-5">
+<section class="container mb-3">
   <div class="pb-2 mt-4 mb-2 border-bottom text-center">
     <h2>Liste des articles
       <a
         class="btn btn-info float-right btn-sm"
         href="/admin/articles/add"
-      ><i class="fa fa-plus"></i> Créer un article</a></h2>
+      ><i class="fa fa-plus"></i> Créer un article</a>
+    </h2>
+    <h6 class="mt-4">Nombre total d'articles : {{count}}</h6>
   </div>
   <div class="row">
     <div class="col">
@@ -14,6 +16,7 @@
             <th>Titre <i class="fa-solid fa-right-left fa-rotate-90"></i></th>
             <th>Auteur <i class="fa-solid fa-right-left fa-rotate-90"></i></th>
             <th>Date de modification <i class="fa-solid fa-right-left fa-rotate-90"></i></th>
+            <th>Commentaires</th>
             <th></th>
           </tr>
         </thead>
@@ -23,6 +26,7 @@
               <td>{{title}}</td>
               <td>{{user.fullname}}</td>
               <td>{{moment updatedAt format="DD/MM/YYYY"}} à {{moment updatedAt format="HH:mm"}}</td>
+              <td class="text-center">{{commentCount}}</td>
               <td class="text-center">
                 <a href="/admin/articles/edit/{{_id}}" class="fa fa-edit me-2" aria-hidden="true"
                     data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Éditer l'article"

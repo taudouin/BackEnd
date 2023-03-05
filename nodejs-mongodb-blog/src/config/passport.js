@@ -1,7 +1,7 @@
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 
-const User = require('../models/user.model')
+const User = require('../models/user.model');
 
 passport.use(new LocalStrategy({
     usernameField: 'email',
@@ -29,7 +29,7 @@ passport.serializeUser((user, done) => {
 passport.deserializeUser((id, done) => {
     User.findById(id, (err, user) => {
         if (!user) {
-            return done(null, false, {message: `Vous n'êtes plus dans la base de données !`});
+            return done(null, false, {message: `L'utilisateur n'a pas été trouvé !`});
         } else {
             const userInformation = {
                 fullname: user.fullname,
@@ -39,5 +39,5 @@ passport.deserializeUser((id, done) => {
         }
         done(err, userInformation);
         }
-    })
-})
+    });
+});

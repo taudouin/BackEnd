@@ -25,4 +25,8 @@ const ArticleSchema = new Schema ({
     }
 );
 
+ArticleSchema.virtual('commentCount').get(function() {
+    return Comment.countDocuments({articleId: this._id});
+  });
+
 module.exports = model('Article', ArticleSchema);

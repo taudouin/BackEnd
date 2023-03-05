@@ -1,5 +1,5 @@
 <div class="container">
-    {{#ifCond userConnected._id user._id}}
+    {{#ifCond userConnected.user user._id}}
     <div class="col-sm-6 mx-auto my-3">
         <div class="card text-center">
             <div class="card-header bg-secondary bg-opacity-50">
@@ -8,6 +8,7 @@
 
             <div class="card-body">
                 <form action="/users/profile/{{user._id}}" method="POST">
+                    <input type="hidden" name="_csrfToken" value={{csrf}}>
                     <div class="form-group mb-2">
                         <input type="text" name="fullname" class="form-control" placeholder="Nom complet" value="{{user.fullname}}" autofocus>
                     </div>

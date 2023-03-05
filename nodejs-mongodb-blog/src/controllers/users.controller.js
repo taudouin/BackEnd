@@ -18,7 +18,6 @@ usersController.signUp = async (req, res) => { // TODO Ajouter question secrète
     const { fullname, password, confirm_password, isHuman } = req.body;
     const email = req.body.email.toLowerCase();
     const uniqueString = randString(128);
-    const isValid = false;
     // if (fullname === "" || email === "" || password === "" || confirm_password === "") {
     //     errors.push({text: `Au moins l'un des champs est vide !`});
     // } else if (fullname.length < 3) {
@@ -107,7 +106,12 @@ usersController.signUp = async (req, res) => { // TODO Ajouter question secrète
                 req.flash('error_msg', 'Ce nom est déjà utilisé !');
                 res.redirect('/users/signup');
             } else {
-                const newUser = new User({fullname, email, password, uniqueString, isValid, role: 'user'});
+                const csrfToken = req.session.csrfToken;
+                const _csrfToken = req.body._csrfToken;
+                if (!csrfToken || csrfToken !== _csrfToken) {
+                    return res.status(403).render('403');
+                }
+                const newUser = new User({fullname, email, password, uniqueString, role: 'user'});
                 newUser.password = await newUser.encrypPassword(password)
                 await newUser.save();
                 const imgLogo = '/public/img/logo.png'
@@ -130,7 +134,7 @@ randString = (length) => {
 
 const sendEmail = (fullname, email, uniqueString, imgLogo) => {
     // Create a SMTP transporter object
-    let transporter = nodemailer.createTransport({
+    const transporter = nodemailer.createTransport({
         host: EMAIL_SMTP_SERVER,
         port: PORT_SMTP_SERVER,
         secure: false,
@@ -189,13 +193,10 @@ usersController.verifyEmail = async (req, res) => {
 };
 
 usersController.isValidated = async (req, res, next) => {
-    const user = res.locals.user
-    const userId = await User.findById(user?._id)
-    if (!user) {
-        req.flash('error_msg', `Vous n'êtes pas connecté !`);
-        res.redirect('/users/signin');
-    } else if (userId.isValid === false) {
-        req.flash('error_msg', `L'adresse email n'a pas encore été validée !`);
+    const email = req.body.email;
+    const emailUser = await User.findOne({email: email});
+    if (!emailUser.isValid) {
+        req.flash('info_msg', `L'adresse email n'a pas encore été validée !`);
         res.redirect('/users/signin');
     } else {
         return next();
@@ -215,7 +216,7 @@ usersController.renderSignInForm = async (req, res) => {
 };
 
 usersController.signIn = (req, res, next) => {
-    let authFunction = passport.authenticate("local", (err, user) => {
+    const authFunction = passport.authenticate('local', (err, user) => {
         if (err) {
             next(err);
         } else {
@@ -243,7 +244,7 @@ usersController.signIn = (req, res, next) => {
 
 usersController.renderEditForm = async (req, res) => {
     const user = await User.findById(req.params.id).lean();
-    const userConnected = res.locals.user;
+    const userConnected = res.locals.connect;
     res.render('users/profile', { user, userConnected });
 };
 
@@ -298,6 +299,11 @@ usersController.updateUser = async (req, res, next) => {
                     email,
                 })
             } else {
+                const csrfToken = req.session.csrfToken;
+                const _csrfToken = req.body._csrfToken;
+                if (!csrfToken || csrfToken !== _csrfToken) {
+                    return res.status(403).render('403');
+                }
                 await User.findByIdAndUpdate(req.params.id, { fullname: fullname, email: email });
                 req.flash('success_msg', `L'utilisateur a bien été mis à jour !`);
                 res.redirect('/');
@@ -625,25 +631,29 @@ usersController.deleteUser = (req, res) => {
         if (err) {
             console.log(`Erreur lors de la suppression de l'utilisateur :` + err);
         } else {
-            req.flash('success_msg', `L'utilisateur a bien été supprimé !`);
-            res.redirect('back');
+            req.flash('success_msg', `L'utilisateur ${User.fullname} a bien été supprimé !`);
+            res.redirect('/admin/users/all-users');
         }
     })
 };
 
 usersController.deleteUserByUser = (req, res) => {
     User.findByIdAndRemove(req.params.id, (err, User) => {
-        req.logout((err) => {
-            if (err) {
-                console.log(`Erreur lors de la suppression de l'utilisateur :` + err);
-                req.flash('error_msg', `Erreur lors de la suppression de votre compte utilisateur !`);
+        if (err) {
+            console.log(`Erreur lors de la suppression de l'utilisateur :` + err);
+        } else {
+            req.logout((err) => {
+                if (err) {
+                    console.log(`Erreur lors de la suppression de l'utilisateur :` + err);
+                    req.flash('error_msg', `Erreur lors de la suppression de votre compte utilisateur !`);
 
-            } else {
-                req.flash('success_msg', `Votre compte utilisateur a bien été supprimé !`);
-                res.redirect('/');
-            }
-        })
-    })
+                } else {
+                    req.flash('success_msg', `Votre compte utilisateur ${User.fullname} a bien été supprimé !`);
+                    res.redirect('/');
+                }
+            });
+        }
+    });
 };
 
 usersController.logout = (req, res, next) => {

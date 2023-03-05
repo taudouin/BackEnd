@@ -18,6 +18,7 @@ const UserSchema = new Schema ({ // TODO Ajouter des 'rôles'
     },
     isValid: {
         type: Boolean,
+        default: false,
         required: true,
     },
     uniqueString: {
