@@ -72,37 +72,38 @@ articlesController.renderArticles = async (req, res) => {
     // TODO Pour n'avoir que par 'user' => const articles = await Article.find({user: req.user._id, author:req.user.fullname}).sort({createdAt: 'desc'}).lean();
     const perPage = 10; // Number of articles in one page
     const page = req.query.p;
-    Article
-    .find({})
+    Article.find({})
     .skip((perPage * page) - perPage)
     .limit(perPage)
     .sort({createdAt: 'desc'})
     .populate('user')
     .lean()
-    .exec((err, articles) => {
-        Article.countDocuments().lean().exec((err, count) => {
-            if (err)
-                return next(err)
-            if (page > 1) {
-                res.render('admin/articles/all-articles', {
-                    pagination: {
-                        page: page || 1,
-                        pageCount: Math.ceil(count / perPage)
-                    },
-                    articles: articles,
-                })
-            } else {
-                res.render('admin/articles/all-articles', {
-                    pagination: {
-                        page: page || 1,
-                        pageCount: Math.ceil(count / perPage)
-                    },
-                    articles: articles,
-                    count
-                })
-            }
-        })
-    })
+    .exec(async (err, articles) => {
+      const count = await Article.countDocuments();
+      const articleData = await Promise.all(articles.map(async article => {
+        const commentCount = await Comment.countDocuments({articleId: article._id});
+        return { ...article, commentCount };
+      }));
+      if (err) return next(err);
+      if (page > 1) {
+        res.render('admin/articles/all-articles', {
+          pagination: {
+            page: page || 1,
+            pageCount: Math.ceil(count / perPage),
+          },
+          articles: articleData,
+        });
+      } else {
+        res.render('admin/articles/all-articles', {
+          pagination: {
+            page: page || 1,
+            pageCount: Math.ceil(count / perPage),
+          },
+          articles: articleData,
+          count,
+        });
+      }
+    });
 };
 
 articlesController.renderEditForm = async (req, res) => {

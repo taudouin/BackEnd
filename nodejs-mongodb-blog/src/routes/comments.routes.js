@@ -7,17 +7,15 @@ const {
     updateComment,
 } = require('../controllers/comments.controller');
 
-const { isValidated } = require('../controllers/users.controller');
-
 const { isAuthenticated } = require('../helpers/auth');
 
  // Create comment
-router.post('/article/:id', isValidated, isAuthenticated, createComment);
+router.post('/article/:id', isAuthenticated, createComment);
 
 // Update one comment
-router.post('/article/comment/:id', isValidated, isAuthenticated, updateComment);
+router.post('/article/comment/:id', isAuthenticated, updateComment);
 
 // Delete one comment
-router.get('/article/comment/:id', isValidated, isAuthenticated, deleteComment);
+router.get('/article/comment/:id', isAuthenticated, deleteComment);
 
 module.exports = router;

@@ -7,10 +7,20 @@ const helmet = require('helmet');
 const flash = require('connect-flash');
 const session = require('express-session');
 const passport = require('passport');
+const crypto = require('crypto');
 const UNIQUE_TOKEN = process.env;
 const MomentHandler = require('handlebars.moment');
 const back = require('express-back');
 const paginate = require('handlebars-paginate');
+
+const cspConfig = {
+    directives: {
+        defaultSrc: ["'self'"],
+        connectSrc: ["'self'", 'https://cdnjs.cloudflare.com', 'https://cookieconsent.popupsmart.com'],
+        scriptSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cookieconsent.popupsmart.com'],
+        styleSrc: ["'self'", "'unsafe-inline'", 'https://cdnjs.cloudflare.com', 'https://cookieconsent.popupsmart.com']
+    }
+};
 
 // Initializations
 const app = express();
@@ -27,14 +37,13 @@ app.engine('hbs', engine({
 }))
 app.set('view engine', 'hbs')
 
-
 // Middlewares
 app.use(morgan('dev'));
 app.use(express.urlencoded({extended: true}));
 app.use(session({
     secret: `${UNIQUE_TOKEN}`,
     resave: true,
-    saveUninitialized: true,
+    saveUninitialized: false,
     cookie: {
         secure: true,
         httpOnly: true,
@@ -43,7 +52,7 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
-app.use(helmet());
+app.use(helmet.contentSecurityPolicy(cspConfig));
 app.use(flash());
 app.use(back());
 
@@ -71,6 +80,11 @@ Handlebars.registerHelper('ifAdmin', function (v1, options) {
 });
 Handlebars.registerHelper('paginate', paginate);
 
+// Function to generate CSRF Token
+function generateCsrfToken() {
+    return crypto.randomBytes(16).toString('hex');
+}
+
 // Global Variables
 app.use((req, res, next) => {
     res.locals.success_msg = req.flash('success_msg');
@@ -79,6 +93,7 @@ app.use((req, res, next) => {
     res.locals.error = req.flash('error');
     res.locals.user = req.user || null;
     res.locals.connect = req.session.passport;
+    res.locals.csrf = req.session.csrfToken || (req.session.csrfToken = generateCsrfToken());
     next();
 });
 

@@ -31,18 +31,18 @@ router.get('/users/signup', renderSignUpForm);
 router.post('/users/signup', signUp);
 
 // All users
-router.get('/admin/users/all-users', isValidated, isAuthenticated, hasAccess('admin'), renderUsers);
+router.get('/admin/users/all-users', isAuthenticated, hasAccess('admin'), renderUsers);
 
 // Log in
 router.get('/users/signin', renderSignInForm);
-router.post('/users/signin', signIn);
+router.post('/users/signin', isValidated, signIn);
 
 // Verify email user
 router.get('/users/verify/:uniqueString', verifyEmail)
 
 // Edit user
-router.get('/users/profile/:id', isValidated, isAuthenticated, renderEditForm);
-router.post('/users/profile/:id', isValidated, isAuthenticated, updateUser);
+router.get('/users/profile/:id', isAuthenticated, renderEditForm);
+router.post('/users/profile/:id', isAuthenticated, updateUser);
     // Change password
 router.get('/users/change-password/:id', renderChangePasswordForm);
 router.post('/users/change-password/:id', changePassword);
@@ -57,9 +57,9 @@ router.post('/users/reset-password/:uniqueString', resetPassword);
 
 // Delete user
     // By the admin
-router.get('/users/delete/:id', isValidated, isAuthenticated, hasAccess('admin'), deleteUser);
+router.get('/users/delete/:id', isAuthenticated, hasAccess('admin'), deleteUser);
     // By the user
-router.get('/users/delete-user/:id', isValidated, isAuthenticated, deleteUserByUser);
+router.get('/users/delete-user/:id', isAuthenticated, deleteUserByUser);
 
 // Log out
 router.get('/users/logout', logout);
