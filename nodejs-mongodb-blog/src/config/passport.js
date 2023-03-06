@@ -11,6 +11,8 @@ passport.use(new LocalStrategy({
     const user = await User.findOne({email: email.toLowerCase()});
     if (!user) {
         return done(null, false, {message: `L'utilisateur n'a pas été trouvé !`});
+    } else if (!user.isValid) {
+            return done(null, false, {message: `L'adresse email n'a pas été validée !`});
     } else {
         // Match password's user
         const match = await user.matchPassword(password);

@@ -35,7 +35,7 @@ router.get('/admin/users/all-users', isAuthenticated, hasAccess('admin'), render
 
 // Log in
 router.get('/users/signin', renderSignInForm);
-router.post('/users/signin', isValidated, signIn);
+router.post('/users/signin', signIn);
 
 // Verify email user
 router.get('/users/verify/:uniqueString', verifyEmail)

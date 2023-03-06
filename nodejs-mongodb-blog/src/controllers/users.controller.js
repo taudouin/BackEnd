@@ -192,17 +192,6 @@ usersController.verifyEmail = async (req, res) => {
     }
 };
 
-usersController.isValidated = async (req, res, next) => {
-    const email = req.body.email;
-    const emailUser = await User.findOne({email: email});
-    if (!emailUser.isValid) {
-        req.flash('info_msg', `L'adresse email n'a pas encore été validée !`);
-        res.redirect('/users/signin');
-    } else {
-        return next();
-    }
-}
-
 usersController.renderSignInForm = async (req, res) => {
     const user = res.locals.user;
     if (user) {
@@ -216,13 +205,13 @@ usersController.renderSignInForm = async (req, res) => {
 };
 
 usersController.signIn = (req, res, next) => {
-    const authFunction = passport.authenticate('local', (err, user) => {
+    const authFunction = passport.authenticate('local', (err, user, info) => {
         if (err) {
             next(err);
         } else {
             req.logIn(user, (err) => {
                 if (err) {
-                    req.flash('error_msg', `Au moins l'un des champs est incorrect !`);
+                    req.flash('error_msg', info.message);
                     res.redirect('/users/signin');
                 } else {
                     if (req.body.rememberMe) {
