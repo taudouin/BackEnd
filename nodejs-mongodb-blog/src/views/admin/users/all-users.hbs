@@ -23,7 +23,7 @@
           {{#each users}}
             <tr>
               <td>{{fullname}}</td>
-              <td>{{email}}</td>
+              <td><a href="mailto:{{email}}">{{email}}</a></td>
               <td>{{moment updatedAt format="DD/MM/YY"}} à {{moment updatedAt format="HH:mm"}}</td>
               <td class="text-center">
                 <!-- Button trigger modal -->
